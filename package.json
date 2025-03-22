@@ -21,7 +21,7 @@
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run prettier -- --write",
     "eslint": "eslint . --ext ts",
-    "prettier": "prettier 'src/**/*.ts'",
+    "prettier": "prettier **/*.ts",
     "prepublishOnly": "npm run build"
   },
   "prettier": "@ionic/prettier-config",
