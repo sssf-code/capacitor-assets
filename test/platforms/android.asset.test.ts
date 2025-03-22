@@ -187,7 +187,7 @@ describe('Android Asset Test - Logo Only', () => {
     let generatedAssets = ((await assets.logoDark?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<AndroidOutputAssetTemplate>[];
 
-    expect(generatedAssets.length).toBe(13);
+    expect(generatedAssets.length).toBe(25);
     await verifySizes(generatedAssets);
   });
 

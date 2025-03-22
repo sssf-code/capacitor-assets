@@ -118,11 +118,7 @@ export class AndroidAssetGenerator extends AssetGenerator {
     asset: InputAsset,
     pipe: Sharp,
   ): Promise<OutputAsset[]> {
-    // Current versions of Android don't appear to support night mode icons (13+ might?)
-    // so, for now, we only generate light mode ones
-    if (asset.kind === AssetKind.LogoDark) {
-      return [];
-    }
+    const isNightMode = asset.kind !== AssetKind.Logo;
 
     // Create the background pipeline for the generated icons
     const backgroundPipe = sharp({
@@ -130,15 +126,15 @@ export class AndroidAssetGenerator extends AssetGenerator {
         width: asset.width!,
         height: asset.height!,
         channels: 4,
-        background:
-          asset.kind === AssetKind.Logo
-            ? (this.options.iconBackgroundColor ?? '#ffffff')
-            : (this.options.iconBackgroundColorDark ?? '#111111'),
+        background: isNightMode
+          ? (this.options.iconBackgroundColorDark ?? '#111111')
+          : (this.options.iconBackgroundColor ?? '#ffffff'),
       },
     });
 
+    const adaptiveIconKind = isNightMode ? AssetKind.AdaptiveIconDark : AssetKind.AdaptiveIcon;
     const icons = Object.values(AndroidAssetTemplates).filter(
-      (a) => a.kind === AssetKind.AdaptiveIcon,
+      (a) => a.kind === adaptiveIconKind,
     ) as AndroidOutputAssetTemplateAdaptiveIcon[];
 
     const backgroundImages = await Promise.all(
