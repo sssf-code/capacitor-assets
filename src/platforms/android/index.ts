@@ -10,13 +10,14 @@ import type {
   AndroidOutputAssetTemplate,
   AndroidOutputAssetTemplateAdaptiveIcon,
   AndroidOutputAssetTemplateSplash,
+  AndroidNotificationTemplate,
 } from '../../definitions';
-import { AssetKind, Platform } from '../../definitions';
+import { AssetKind, Format, Platform } from '../../definitions';
 import { BadPipelineError, BadProjectError } from '../../error';
 import type { InputAsset } from '../../input-asset';
 import { OutputAsset } from '../../output-asset';
 import type { Project } from '../../project';
-import { warn } from '../../util/log';
+import { warn, error } from '../../util/log';
 
 import * as AndroidAssetTemplates from './assets';
 
@@ -520,5 +521,73 @@ export class AndroidAssetGenerator extends AssetGenerator {
 
   private getResPath(project: Project): string {
     return join(project.config.android!.path!, 'app', 'src', this.options.androidFlavor ?? 'main', 'res');
+  }
+
+  private async generateNotificationIcons(asset: InputAsset, project: Project): Promise<OutputAsset[]> {
+    const pipe = asset.pipeline();
+    if (!pipe) {
+      throw new BadPipelineError('Sharp instance not created');
+    }
+
+    const notificationTemplates = Object.values(AndroidAssetTemplates).filter(
+      (a) => a.kind === AssetKind.NotificationIcon,
+    ) as AndroidNotificationTemplate[];
+    const resPath = this.getResPath(project);
+    const generated: OutputAsset[] = [];
+
+    for (const template of notificationTemplates) {
+      try {
+        const drawablePath = join(resPath, `drawable-${template.density}`);
+        if (!(await pathExists(drawablePath))) {
+          await mkdirp(drawablePath);
+        }
+
+        const destFile = join(drawablePath, 'ic_stat_notification.png');
+        const outputInfo = await pipe.resize(template.width, template.height).png().toFile(destFile);
+
+        const relPath = relative(resPath, destFile);
+        generated.push(new OutputAsset(template, asset, project, { [relPath]: destFile }, { [relPath]: outputInfo }));
+      } catch (err) {
+        error(`Failed to generate ${template.density} notification icon:`, err);
+      }
+    }
+
+    // Generate for main drawable folder
+    try {
+      const mainDrawablePath = join(resPath, 'drawable');
+      if (!(await pathExists(mainDrawablePath))) {
+        await mkdirp(mainDrawablePath);
+      }
+
+      const mainDestFile = join(mainDrawablePath, 'ic_stat_notification.png');
+      const outputInfo = await pipe
+        .resize(
+          AndroidAssetTemplates.ANDROID_NOTIFICATION_XXXHDPI_ICON.width,
+          AndroidAssetTemplates.ANDROID_NOTIFICATION_XXXHDPI_ICON.height,
+        )
+        .png()
+        .toFile(mainDestFile);
+
+      const relPath = relative(resPath, mainDestFile);
+      generated.push(
+        new OutputAsset(
+          {
+            platform: Platform.Android,
+            kind: AssetKind.NotificationIcon,
+            format: Format.Png,
+            width: AndroidAssetTemplates.ANDROID_NOTIFICATION_XXXHDPI_ICON.width,
+            height: AndroidAssetTemplates.ANDROID_NOTIFICATION_XXXHDPI_ICON.height,
+          },
+          asset,
+          project,
+          { [relPath]: mainDestFile },
+          { [relPath]: outputInfo },
+        ),
+      );
+    } catch (err) {
+      error('Failed to generate main notification icon:', err);
+    }
+
+    return generated;
   }
 }
