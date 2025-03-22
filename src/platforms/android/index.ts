@@ -132,8 +132,8 @@ export class AndroidAssetGenerator extends AssetGenerator {
         channels: 4,
         background:
           asset.kind === AssetKind.Logo
-            ? this.options.iconBackgroundColor ?? '#ffffff'
-            : this.options.iconBackgroundColorDark ?? '#111111',
+            ? (this.options.iconBackgroundColor ?? '#ffffff')
+            : (this.options.iconBackgroundColorDark ?? '#111111'),
       },
     });
 
