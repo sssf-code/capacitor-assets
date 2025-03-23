@@ -1,5 +1,11 @@
 # Capacitor Assets
 
+> **NOTE**
+>
+> my fork here exists purely for the sake of testing, playing, and learning.. please don't use this in any real-world production environment?
+>
+> some of this will be my own code, some will be from outdated upstream PRs that fixes and features that are still relevant today.. adapting it slightly so it all works together.
+
 This tool will crop and resize JPEG and PNG source images to generate icons and splash screens for iOS, Android, and Progressive Web Apps using [Capacitor](https://capacitorjs.com/).
 
 Note: previous versions of this tool supported Cordova but Cordova support has been removed as of `1.x`. We strongly recommend teams [migrate to Capacitor](https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor).
