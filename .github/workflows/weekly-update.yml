@@ -38,6 +38,12 @@ jobs:
       - name: Install (update lockfile if needed)
         run: npm install --no-audit --no-fund
 
+      - name: Clean dist
+        run: npx rimraf dist
+
+      - name: Build
+        run: npm run build
+
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
