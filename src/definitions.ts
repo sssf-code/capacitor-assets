@@ -30,6 +30,7 @@ export const enum AssetKind {
   Logo = 'logo',
   LogoDark = 'logo-dark',
   AdaptiveIcon = 'adaptive-icon',
+  AdaptiveIconDark = 'adaptive-icon-dark',
   Icon = 'icon',
   IconForeground = 'icon-foreground',
   IconBackground = 'icon-background',
@@ -143,6 +144,11 @@ export interface PwaOutputAssetTemplate extends OutputAssetTemplate {
 
 export interface AndroidOutputAssetTemplate extends OutputAssetTemplate {
   density: AndroidDensity;
+}
+export interface AndroidNotificationTemplate extends AndroidOutputAssetTemplate {
+  kind: AssetKind.NotificationIcon;
+  width: number;
+  height: number;
 }
 export interface AndroidOutputAssetTemplateSplash extends OutputAssetTemplate {
   density: AndroidDensity;

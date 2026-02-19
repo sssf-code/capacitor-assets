@@ -1,0 +1,54 @@
+name: Weekly Version Bump and Updates
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    # Runs every Monday at 6:00 AM UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}
+
+jobs:
+  weekly-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Bump patch version
+        id: bump-version
+        run: |
+          NEW_VERSION=$(npm version patch --no-git-tag-version)
+          echo "new_version=${NEW_VERSION#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Update dependencies
+        run: npm update
+
+      - name: Install (update lockfile if needed)
+        run: npm install --no-audit --no-fund
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit and push changes
+        run: |
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: weekly version bump to v${{ steps.bump-version.outputs.new_version }} and dependency updates"
+            git push
+          fi

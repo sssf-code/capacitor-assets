@@ -74,11 +74,7 @@ describe('iOS Asset Test', () => {
   });
 
   it('Should generate ios icons', async () => {
-    const exportedIcons = Object.values(IosAssets).filter(
-      (a) =>
-        [AssetKind.Icon].indexOf(a.kind) >=
-        0,
-    );
+    const exportedIcons = Object.values(IosAssets).filter((a) => [AssetKind.Icon].indexOf(a.kind) >= 0);
 
     const strategy = new IosAssetGenerator();
     let generatedAssets = ((await assets.icon?.generate(strategy, ctx.project)) ??
@@ -129,12 +125,7 @@ describe('iOS Asset Test - Logo Only', () => {
       []) as OutputAsset<IosOutputAssetTemplate>[];
 
     const assetTemplates = Object.values(IosAssets).filter(
-      (a) =>
-        [
-          AssetKind.Icon,
-          AssetKind.Splash,
-          AssetKind.SplashDark,
-        ].indexOf(a.kind) >= 0,
+      (a) => [AssetKind.Icon, AssetKind.Splash, AssetKind.SplashDark].indexOf(a.kind) >= 0,
     );
 
     expect(generatedAssets.length).toBe(assetTemplates.length);
@@ -158,12 +149,7 @@ describe('iOS Asset Test - Logo Only', () => {
       []) as OutputAsset<IosOutputAssetTemplate>[];
 
     const assetTemplates = Object.values(IosAssets).filter(
-      (a) =>
-        [
-          AssetKind.Icon,
-          AssetKind.Splash,
-          AssetKind.SplashDark,
-        ].indexOf(a.kind) >= 0,
+      (a) => [AssetKind.Icon, AssetKind.Splash, AssetKind.SplashDark].indexOf(a.kind) >= 0,
     );
 
     // Shouldn't generate standard splash
