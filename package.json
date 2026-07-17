@@ -3,7 +3,7 @@
   "version": "4.0.0",
   "packageManager": "pnpm@11.13.1",
   "description": "Generate icon and splash screen images for Capacitor apps",
-  "homepage": "https://ionicframework.com",
+  "homepage": "https://github.com/sssf-code/capacitor-assets",
   "author": "Ionic Team <hi@ionicframework.com>",
   "license": "MIT",
   "main": "dist/index.js",
@@ -31,10 +31,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ionic-team/capacitor-assets.git"
+    "url": "git+https://github.com/sssf-code/capacitor-assets.git"
   },
   "bugs": {
-    "url": "https://github.com/ionic-team/capacitor-assets/issues"
+    "url": "https://github.com/sssf-code/capacitor-assets/issues"
   },
   "keywords": [
     "ionic",

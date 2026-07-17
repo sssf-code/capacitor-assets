@@ -1,10 +1,8 @@
-# Capacitor Assets
+# sssf-capacitor-assets
 
 > **NOTE**
 >
-> my fork here exists purely for the sake of testing, playing, and learning.. please don't use this in any real-world production environment?
->
-> some of this will be my own code, some will be from outdated upstream PRs that fixes and features that are still relevant today.. adapting it slightly so it all works together.
+> This is a maintained fork of [`@capacitor/assets`](https://github.com/ionic-team/capacitor-assets) (upstream is stalled), renamed to `sssf-capacitor-assets` as of 4.0.0. It requires Node >= 22.12.
 
 This tool will crop and resize JPEG and PNG source images to generate icons and splash screens for iOS, Android, and Progressive Web Apps using [Capacitor](https://capacitorjs.com/).
 
@@ -13,7 +11,8 @@ Note: previous versions of this tool supported Cordova but Cordova support has b
 ## Install
 
 ```shell
-npm install --save-dev @capacitor/assets
+pnpm add -D github:sssf-code/capacitor-assets#main
+# or: npm install --save-dev github:sssf-code/capacitor-assets#main
 ```
 
 ## Usage
@@ -37,7 +36,7 @@ assets/
 Then, generate the assets and provide the background colors that will be used to generate background layers for icons:
 
 ```shell
-npx @capacitor/assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#111111'
+npx capacitor-assets generate --iconBackgroundColor '#eeeeee' --iconBackgroundColorDark '#222222' --splashBackgroundColor '#eeeeee' --splashBackgroundColorDark '#111111'
 ```
 
 Where the provided flags are:
@@ -75,16 +74,16 @@ assets/
 To generate resources with all the default options, just run:
 
 ```shell
-npx @capacitor/assets generate
+npx capacitor-assets generate
 ```
 
-`@capacitor/assets` accepts a platform for the first argument (`ios`, `android`, or `pwa` currently). If specified, resources are generated only for that platform:
+`sssf-capacitor-assets` accepts a platform for the first argument (`ios`, `android`, or `pwa` currently). If specified, resources are generated only for that platform:
 
 ```shell
-npx @capacitor/assets generate --ios
+npx capacitor-assets generate --ios
 ```
 
-Otherwise `@capacitor/assets` will use all detected Capacitor platforms.
+Otherwise `sssf-capacitor-assets` will use all detected Capacitor platforms.
 
 ## PWA Notes
 
@@ -99,5 +98,5 @@ By default, the tool will look for the manifest file in `public`, `src`, and `ww
 See the help instructions on the command line with the `--help` flag.
 
 ```shell
-npx @capacitor/assets generate --help
+npx capacitor-assets generate --help
 ```

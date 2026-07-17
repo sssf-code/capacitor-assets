@@ -15,7 +15,7 @@ async function run(ctx) {
         }
         const assets = await ctx.project.loadInputAssets();
         if ([assets.logo, assets.icon, assets.splash, assets.splashDark].every((a) => !a)) {
-            (0, log_1.error)(`No assets found in the asset path ${c.ancillary(ctx.project.assetDir)}. See https://github.com/ionic-team/capacitor-assets to learn how to use this tool.`);
+            (0, log_1.error)(`No assets found in the asset path ${c.ancillary(ctx.project.assetDir)}. See https://github.com/sssf-code/capacitor-assets to learn how to use this tool.`);
             return [];
         }
         let platforms = ['ios', 'android', 'pwa'];

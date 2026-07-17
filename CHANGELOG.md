@@ -1,4 +1,6 @@
-# @capacitor/assets
+# sssf-capacitor-assets
+
+> Renamed from `@capacitor/assets` in 4.0.0 (fork of ionic-team/capacitor-assets).
 
 ## 3.0.4
 
