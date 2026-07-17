@@ -1,6 +1,8 @@
-# Security pins for unmaintained transitive dependencies.
+# Security pins for unmaintained transitive dependencies of @trapezedev/project.
 # Revisit periodically — remove once the parent package updates its own ranges.
 overrides:
-  'mergexml>@xmldom/xmldom': ^0.8.13
-  'xcode>uuid': ^11.1.1
-  'replace>minimatch': ^3.1.5
+  # npm's `xcode` (3.0.1, Dec 2021) still depends on vulnerable uuid@7.
+  # Apache's repo dropped uuid entirely; pin to a reviewed commit of master (4.0.0-dev).
+  xcode: github:apache/cordova-node-xcode#4a9fd3421e5bc00033461c025835a238a15e5c2d
+  # `replace` is declared by trapeze but never required at runtime — remove it.
+  replace: '-'
