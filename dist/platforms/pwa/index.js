@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PwaAssetGenerator = exports.PWA_ASSET_PATH = void 0;
 const tslib_1 = require("tslib");
 const utils_fs_1 = require("@ionic/utils-fs");
-const node_html_parser_1 = tslib_1.__importDefault(require("node-html-parser"));
 const path_1 = require("path");
 const sharp_1 = tslib_1.__importDefault(require("sharp"));
 const asset_generator_1 = require("../../asset-generator");
@@ -22,37 +21,17 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         return JSON.parse(contents);
     }
     async getSplashSizes() {
-        const appleInterfacePage = `https://developer.apple.com/design/human-interface-guidelines/foundations/layout/`;
-        let assetSizes = assets_1.PWA_IOS_DEVICE_SIZES;
-        if (!this.options.pwaNoAppleFetch) {
-            try {
-                const res = await fetch(appleInterfacePage);
-                const html = await res.text();
-                const doc = (0, node_html_parser_1.default)(html);
-                const target = doc.querySelector('main > section .row > .column table');
-                const sizes = target?.querySelectorAll('tr > td:nth-child(2)') ?? [];
-                const sizeStrings = sizes.map((td) => {
-                    const t = td.innerText;
-                    return t
-                        .slice(t.indexOf('pt (') + 4)
-                        .slice(0, -1)
-                        .replace(' px ', '');
-                });
-                const deduped = new Set(sizeStrings);
-                assetSizes = Array.from(deduped);
-            }
-            catch {
-                (0, log_1.warn)(`Unable to load iOS HIG screen sizes to generate iOS PWA splash screens. Using local snapshot of device sizes. Use --pwaNoAppleFetch true to always use local sizes`);
-            }
-        }
-        return assetSizes;
+        // Historically this scraped Apple's HIG layout page for device sizes,
+        // but the page's markup changed and the scrape silently returned an
+        // empty list. The maintained static list is now the single source.
+        return assets_1.PWA_IOS_DEVICE_SIZES;
     }
     async generate(asset, project) {
         const pwaDir = project.directory;
         if (!pwaDir) {
             throw new error_1.BadProjectError('No web app (PWA) found');
         }
-        if (asset.platform !== "any" /* Platform.Any */) {
+        if (asset.platform !== "any" /* Platform.Any */ && asset.platform !== "pwa" /* Platform.Pwa */) {
             return [];
         }
         switch (asset.kind) {
@@ -186,7 +165,34 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
                 // ignore error
             }
             const dest = (0, path_1.join)(destDir, icon.name);
-            const outputInfo = await pipe.resize(icon.width, icon.height).png().toFile(dest);
+            let outputInfo;
+            if (icon.purpose === 'maskable' || icon.excludeFromManifest) {
+                // Maskable and apple-touch icons need an opaque background with
+                // the art confined to the central safe zone: only a circle of
+                // radius 40% is guaranteed to survive masking, and iOS applies
+                // its own rounded mask to apple-touch icons.
+                const safeZoneScale = 0.8;
+                const scaled = await (0, sharp_1.default)(asset.path)
+                    .resize(Math.round(icon.width * safeZoneScale), Math.round(icon.height * safeZoneScale), {
+                    fit: 'contain',
+                    background: { r: 0, g: 0, b: 0, alpha: 0 },
+                })
+                    .toBuffer();
+                outputInfo = await (0, sharp_1.default)({
+                    create: {
+                        width: icon.width,
+                        height: icon.height,
+                        channels: 4,
+                        background: this.options.iconBackgroundColor ?? '#ffffff',
+                    },
+                })
+                    .composite([{ input: scaled, gravity: sharp_1.default.gravity.center }])
+                    .png()
+                    .toFile(dest);
+            }
+            else {
+                outputInfo = await (0, sharp_1.default)(asset.path).resize(icon.width, icon.height).png().toFile(dest);
+            }
             return new output_asset_1.OutputAsset(icon, asset, project, {
                 [icon.name]: dest,
             }, {
@@ -251,7 +257,7 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         const pwaDir = await this.getPWADirectory(project.directory ?? undefined);
         const pwaAssetDir = await this.getPWAAssetsDirectory(pwaDir);
         const manifestPath = await this.getManifestJsonPath(project.directory ?? undefined);
-        const pwaAssets = assets.filter((a) => a.template.platform === "pwa" /* Platform.Pwa */);
+        const pwaAssets = assets.filter((a) => a.template.platform === "pwa" /* Platform.Pwa */ && !a.template.excludeFromManifest);
         let manifestJson = {};
         if (await (0, utils_fs_1.pathExists)(manifestPath)) {
             manifestJson = await (0, utils_fs_1.readJSON)(manifestPath);
@@ -264,16 +270,13 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
             const relativePath = (0, path_1.relative)(pwaDir, (0, path_1.join)(pwaAssetDir, exports.PWA_ASSET_PATH, fname));
             replacedIcons.push(this.makeIconManifestEntry(asset.template, relativePath));
         }
-        // Delete icons that were replaced
+        // Delete previously generated icon files that are no longer part of
+        // the generated set (e.g. legacy sizes from an older version)
+        const newSrcs = new Set(replacedIcons.map((i) => i.src));
         for (const icon of icons) {
-            if (await (0, utils_fs_1.pathExists)((0, path_1.join)(pwaDir, icon.src))) {
-                const exists = !!pwaAssets.find(({ template: { width, height } }) => {
-                    return `${width}x${height}` === icon.sizes;
-                });
-                if (!exists) {
-                    (0, utils_fs_1.rmSync)((0, path_1.join)(pwaDir, icon.src));
-                    (0, log_1.warn)(`DELETE ${icon.src}`);
-                }
+            if (!newSrcs.has(icon.src) && (await (0, utils_fs_1.pathExists)((0, path_1.join)(pwaDir, icon.src)))) {
+                (0, utils_fs_1.rmSync)((0, path_1.join)(pwaDir, icon.src));
+                (0, log_1.warn)(`DELETE ${icon.src}`);
             }
         }
         icons = replacedIcons;
@@ -291,13 +294,14 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         });
     }
     makeIconManifestEntry(asset, relativePath) {
-        const ext = (0, path_1.extname)(relativePath);
+        const ext = (0, path_1.extname)(relativePath).replace('.', '');
         const posixPath = relativePath.split(path_1.sep).join(path_1.posix.sep);
         const type = {
             png: 'image/png',
             jpg: 'image/jpeg',
             jpeg: 'image/jpeg',
             svg: 'image/svg+xml',
+            webp: 'image/webp',
         }[ext] || 'image/png';
         const entry = {
             src: posixPath,
@@ -305,7 +309,7 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
             sizes: `${asset.width}x${asset.height}`,
         };
         if (asset.kind === "icon" /* AssetKind.Icon */) {
-            entry.purpose = 'any maskable';
+            entry.purpose = asset.purpose ?? 'any';
         }
         return entry;
     }
@@ -352,72 +356,46 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         });
         return splashOutput;
     }
-    static logInstructions(generated) {
+    async logInstructions(project, generated) {
+        const pwaDir = await this.getPWADirectory(project.directory ?? undefined);
+        const webPath = (g) => {
+            const dest = Object.values(g.destFilenames)[0] ?? '';
+            return '/' + (0, path_1.relative)(pwaDir, dest).split(path_1.sep).join(path_1.posix.sep);
+        };
+        const pwaAssets = generated.filter((g) => g.template.platform === "pwa" /* Platform.Pwa */);
         (0, log_1.log)(`PWA instructions:
 
-Add the following tags to your index.html to support PWA icons:
+Add the following tags to your index.html to support PWA icons and iOS splash screens:
 `);
-        const pwaAssets = generated.filter((g) => g.template.platform === "pwa" /* Platform.Pwa */);
-        const mainIcon = pwaAssets.find((g) => g.template.width == 512 && g.template.kind === "icon" /* AssetKind.Icon */);
-        (0, log_1.log)(`<link rel="apple-touch-icon" href="${Object.values(mainIcon?.destFilenames ?? {})[0]}">`);
-        for (const g of pwaAssets.filter((a) => a.template.kind === "icon" /* AssetKind.Icon */)) {
-            const w = g.template.width;
-            const h = g.template.height;
-            const path = Object.values(g.destFilenames)[0] ?? '';
-            (0, log_1.log)(`<link rel="apple-touch-icon" sizes="${w}x${h}" href="${path}">`);
+        const touchIcon = pwaAssets.find((g) => g.template.name === 'apple-touch-icon.png');
+        if (touchIcon) {
+            (0, log_1.log)(`<link rel="apple-touch-icon" href="${webPath(touchIcon)}">`);
         }
-        for (const g of pwaAssets.filter((a) => a.template.kind === "splash" /* AssetKind.Splash */)) {
+        // apple-touch-startup-image media queries use CSS points (px / scale)
+        const splashLink = (g, dark, landscape) => {
             const template = g.template;
-            const w = g.template.width;
-            const h = g.template.height;
-            const path = Object.values(g.destFilenames)[0] ?? '';
-            (0, log_1.log)(`<link rel="apple-touch-startup-image" href="${path}" media="(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${template.density}) and (orientation: ${"portrait" /* Orientation.Portrait */})>`);
-        }
+            const scale = parseInt(template.density ?? '2', 10);
+            const wPts = template.width / scale;
+            const hPts = template.height / scale;
+            const deviceW = landscape ? hPts : wPts;
+            const deviceH = landscape ? wPts : hPts;
+            const media = [
+                ...(dark ? ['(prefers-color-scheme: dark)'] : []),
+                `(device-width: ${deviceW}px)`,
+                `(device-height: ${deviceH}px)`,
+                `(-webkit-device-pixel-ratio: ${scale})`,
+                `(orientation: ${landscape ? "landscape" /* Orientation.Landscape */ : "portrait" /* Orientation.Portrait */})`,
+            ].join(' and ');
+            return `<link rel="apple-touch-startup-image" href="${webPath(g)}" media="${media}">`;
+        };
         for (const g of pwaAssets.filter((a) => a.template.kind === "splash" /* AssetKind.Splash */)) {
-            const template = g.template;
-            const w = g.template.width;
-            const h = g.template.height;
-            const path = Object.values(g.destFilenames)[0] ?? '';
-            (0, log_1.log)(`<link rel="apple-touch-startup-image" href="${path}" media="(device-width: ${h}px) and (device-height: ${w}px) and (-webkit-device-pixel-ratio: ${template.density}) and (orientation: ${"landscape" /* Orientation.Landscape */})>`);
+            (0, log_1.log)(splashLink(g, false, false));
+            (0, log_1.log)(splashLink(g, false, true));
         }
         for (const g of pwaAssets.filter((a) => a.template.kind === "splash-dark" /* AssetKind.SplashDark */)) {
-            const template = g.template;
-            const w = g.template.width;
-            const h = g.template.height;
-            const path = Object.values(g.destFilenames)[0] ?? '';
-            (0, log_1.log)(`<link rel="apple-touch-startup-image" href="${path}" media="(prefers-color-scheme: dark) and (device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${template.density}) and (orientation: ${"portrait" /* Orientation.Portrait */})>`);
+            (0, log_1.log)(splashLink(g, true, false));
+            (0, log_1.log)(splashLink(g, true, true));
         }
-        for (const g of pwaAssets.filter((a) => a.template.kind === "splash-dark" /* AssetKind.SplashDark */)) {
-            const template = g.template;
-            const w = g.template.width;
-            const h = g.template.height;
-            const path = Object.values(g.destFilenames)[0] ?? '';
-            (0, log_1.log)(`<link rel="apple-touch-startup-image" href="${path}" media="(prefers-color-scheme: dark) and (device-width: ${h}px) and (device-height: ${w}px) and (-webkit-device-pixel-ratio: ${template.density}) and (orientation: ${"landscape" /* Orientation.Landscape */})>`);
-        }
-        console.log('Generated', pwaAssets.filter((a) => a.template.kind === "splash" /* AssetKind.Splash */).length, pwaAssets.filter((a) => a.template.kind === "splash-dark" /* AssetKind.SplashDark */).length);
-        /*
-        for (const g of pwaAssets.filter(a => a.template.kind === AssetKind.Splash)) {
-          const w = g.template.width;
-          const h = g.template.height;
-          const path = Object.values(g.destFilenames)[0] ?? '';
-          log(`<link rel="apple-touch-startup-image" href="${path}" media="(device-width: ${w}px) and (device-height: ${h}px) and (orientation: ${g.template>`);
-        }
-        */
     }
 }
 exports.PwaAssetGenerator = PwaAssetGenerator;
-/*
-export async function copyIcons(
-  resourcePath: string,
-  projectPath: string,
-  logstream: NodeJS.WritableStream | null,
-  errstream: NodeJS.WritableStream | null,
-): Promise<number> {
-  const source = join(resourcePath, SOURCE_PWA_ICON);
-  const dest = join(projectPath, PWA_ASSET_PATH);
-
-  await Promise.all(copyImages(source, dest, PWA_ICONS, logstream, errstream));
-
-  return PWA_ICONS.length;
-}
-*/

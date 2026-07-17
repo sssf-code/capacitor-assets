@@ -21,6 +21,31 @@ import { warn, error } from '../../util/log';
 
 import * as AndroidAssetTemplates from './assets';
 
+/**
+ * Adaptive icon layer XML (mipmap-anydpi-v26/ic_launcher.xml).
+ *
+ * - The background layer must be full-bleed (108dp, opaque) — masks and
+ *   parallax may expose any part of it, so it is never inset.
+ * - The foreground is inset so the logo stays inside the 66dp safe zone
+ *   of the 108dp canvas ((108 - 66) / 2 / 108 ≈ 19.4%).
+ * - The monochrome layer enables Android 13+ themed icons; the system uses
+ *   the alpha channel of the drawable, so the foreground works as a source.
+ *   Without it, Android 16 QPR2+ force-themes icons with an auto-derived
+ *   (and often artifact-prone) monochrome version.
+ */
+const IC_LAUNCHER_XML = `
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_background" />
+    <foreground>
+        <inset android:drawable="@mipmap/ic_launcher_foreground" android:inset="19.4%" />
+    </foreground>
+    <monochrome>
+        <inset android:drawable="@mipmap/ic_launcher_foreground" android:inset="19.4%" />
+    </monochrome>
+</adaptive-icon>
+`.trim();
+
 export class AndroidAssetGenerator extends AssetGenerator {
   constructor(options: AssetGeneratorOptions = {}) {
     super(options);
@@ -47,6 +72,8 @@ export class AndroidAssetGenerator extends AssetGenerator {
         return this.generateAdaptiveIconForeground(asset, project);
       case AssetKind.IconBackground:
         return this.generateAdaptiveIconBackground(asset, project);
+      case AssetKind.NotificationIcon:
+        return this.generateNotificationIcons(asset, project);
       case AssetKind.Splash:
       case AssetKind.SplashDark:
         return this.generateSplashes(asset, project);
@@ -277,7 +304,9 @@ export class AndroidAssetGenerator extends AssetGenerator {
 
     // This pipeline is trick, but we need two separate pipelines
     // per https://github.com/lovell/sharp/issues/2378#issuecomment-864132578
-    const padding = 8;
+    // Padding scales with density so the logo renders at the same
+    // relative size at every dpi (8px at the 96px xhdpi baseline).
+    const padding = Math.round(template.width / 12);
     const resized = await sharp(asset.path)
       .resize(template.width, template.height)
       // .composite([{ input: Buffer.from(svg), blend: 'dest-in' }])
@@ -354,27 +383,14 @@ export class AndroidAssetGenerator extends AssetGenerator {
     }
     const outputInfoForeground = await pipe.resize(icon.width, icon.height).png().toFile(destForeground);
 
-    // Create the adaptive icon XML
-    const icLauncherXml = `
-<?xml version="1.0" encoding="utf-8"?>
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background>
-        <inset android:drawable="@mipmap/ic_launcher_background" android:inset="16.6%" />
-    </background>
-    <foreground>
-        <inset android:drawable="@mipmap/ic_launcher_foreground" android:inset="16.6%" />
-    </foreground>
-</adaptive-icon>
-    `.trim();
-
     const mipmapAnyPath = join(resPath, `mipmap-anydpi-v26`);
     if (!(await pathExists(mipmapAnyPath))) {
       await mkdirp(mipmapAnyPath);
     }
     const destIcLauncher = join(mipmapAnyPath, `ic_launcher.xml`);
     const destIcLauncherRound = join(mipmapAnyPath, `ic_launcher_round.xml`);
-    await writeFile(destIcLauncher, icLauncherXml);
-    await writeFile(destIcLauncherRound, icLauncherXml);
+    await writeFile(destIcLauncher, IC_LAUNCHER_XML);
+    await writeFile(destIcLauncherRound, IC_LAUNCHER_XML);
 
     // Return the created files for this OutputAsset
     return new OutputAsset(
@@ -425,27 +441,14 @@ export class AndroidAssetGenerator extends AssetGenerator {
 
     const outputInfoBackground = await pipe.resize(icon.width, icon.height).png().toFile(destBackground);
 
-    // Create the adaptive icon XML
-    const icLauncherXml = `
-<?xml version="1.0" encoding="utf-8"?>
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background>
-        <inset android:drawable="@mipmap/ic_launcher_background" android:inset="16.6%" />
-    </background>
-    <foreground>
-        <inset android:drawable="@mipmap/ic_launcher_foreground" android:inset="16.6%" />
-    </foreground>
-</adaptive-icon>
-    `.trim();
-
     const mipmapAnyPath = join(resPath, `mipmap-anydpi-v26`);
     if (!(await pathExists(mipmapAnyPath))) {
       await mkdirp(mipmapAnyPath);
     }
     const destIcLauncher = join(mipmapAnyPath, `ic_launcher.xml`);
     const destIcLauncherRound = join(mipmapAnyPath, `ic_launcher_round.xml`);
-    await writeFile(destIcLauncher, icLauncherXml);
-    await writeFile(destIcLauncherRound, icLauncherXml);
+    await writeFile(destIcLauncher, IC_LAUNCHER_XML);
+    await writeFile(destIcLauncherRound, IC_LAUNCHER_XML);
 
     // Return the created files for this OutputAsset
     return new OutputAsset(

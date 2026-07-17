@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { copy, pathExists, rmSync as rm } from '@ionic/utils-fs';
+import { copy, pathExists, readFile, rmSync as rm } from '@ionic/utils-fs';
 import { temporaryDirectory } from 'tempy';
 import sharp from 'sharp';
 import { join } from 'path';
@@ -64,9 +64,8 @@ describe('Android asset test', () => {
     let generatedAssets = ((await assets.icon?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<AndroidOutputAssetTemplateAdaptiveIcon>[];
 
-    // Expect legacy main icons and rounded to be generated
-    expect(generatedAssets.length).toBe(12);
-
+    // Expect legacy main icons and rounded to be generated (5 densities each, no ldpi)
+    expect(generatedAssets.length).toBe(10);
 
     Object.values(generatedAssets[0].destFilenames).map(async (f) => expect(await pathExists(f)).toBe(true));
 
@@ -80,17 +79,38 @@ describe('Android asset test', () => {
     let generatedAssets = ((await assets.iconForeground?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<AndroidOutputAssetTemplateAdaptiveIcon>[];
 
-    expect(generatedAssets.length).toBe(6);
+    expect(generatedAssets.length).toBe(5);
 
     Object.values(generatedAssets[0].destFilenames).map(async (f) => expect(await pathExists(f)).toBe(true));
 
     generatedAssets = ((await assets.iconBackground?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<AndroidOutputAssetTemplateAdaptiveIcon>[];
 
-    expect(generatedAssets.length).toBe(6);
+    expect(generatedAssets.length).toBe(5);
 
     Object.values(generatedAssets[0].destFilenames).map(async (f) => expect(await pathExists(f)).toBe(true));
 
+    await verifySizes(generatedAssets);
+
+    // The adaptive icon XML must have a full-bleed background and a
+    // monochrome layer for Android 13+ themed icons
+    const icLauncherXml = await readFile(
+      join(ctx.project.config.android!.path!, 'app', 'src', 'main', 'res', 'mipmap-anydpi-v26', 'ic_launcher.xml'),
+      { encoding: 'utf-8' },
+    );
+    expect(icLauncherXml).toContain('<monochrome>');
+    expect(icLauncherXml).toContain('<background android:drawable="@mipmap/ic_launcher_background" />');
+  });
+
+  it('Should generate android notification icons', async () => {
+    const assets = await ctx.project.loadInputAssets();
+
+    const strategy = new AndroidAssetGenerator();
+    const generatedAssets = ((await assets.androidNotificationIcon?.generate(strategy, ctx.project)) ??
+      []) as OutputAsset<AndroidOutputAssetTemplate>[];
+
+    // 5 densities plus the density-less drawable fallback
+    expect(generatedAssets.length).toBe(6);
     await verifySizes(generatedAssets);
   });
 
@@ -167,7 +187,7 @@ describe('Android Asset Test - Logo Only', () => {
     let generatedAssets = ((await assets.logo?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<AndroidOutputAssetTemplate>[];
 
-    expect(generatedAssets.length).toBe(50);
+    expect(generatedAssets.length).toBe(46);
     await verifySizes(generatedAssets);
   });
 
@@ -179,7 +199,7 @@ describe('Android Asset Test - Logo Only', () => {
     let generatedAssets = ((await assets.logoDark?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<AndroidOutputAssetTemplate>[];
 
-    expect(generatedAssets.length).toBe(25);
+    expect(generatedAssets.length).toBe(23);
     await verifySizes(generatedAssets);
   });
 

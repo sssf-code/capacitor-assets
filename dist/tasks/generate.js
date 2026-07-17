@@ -41,11 +41,10 @@ async function run(ctx) {
             if (!ctx.args.silent) {
                 logGenerated(generated);
             }
-            /*
             if (!ctx.args.silent && platforms.indexOf('pwa') >= 0 && ctx.args.pwaTags) {
-              PwaAssetGenerator.logInstructions(generated);
+                const pwaGenerator = generators.find((g) => g instanceof pwa_1.PwaAssetGenerator);
+                await pwaGenerator?.logInstructions(ctx.project, generated);
             }
-            */
             return generated;
         }
         else {

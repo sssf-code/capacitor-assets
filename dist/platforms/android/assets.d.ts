@@ -1,5 +1,4 @@
 import type { AndroidOutputAssetTemplate, AndroidOutputAssetTemplateAdaptiveIcon, AndroidOutputAssetTemplateSplash } from '../../definitions';
-export declare const ANDROID_LDPI_ICON: AndroidOutputAssetTemplate;
 export declare const ANDROID_MDPI_ICON: AndroidOutputAssetTemplate;
 export declare const ANDROID_HDPI_ICON: AndroidOutputAssetTemplate;
 export declare const ANDROID_XHDPI_ICON: AndroidOutputAssetTemplate;
@@ -16,13 +15,11 @@ export declare const ANDROID_NOTIFICATION_XXXHDPI_ICON: AndroidOutputAssetTempla
 /**
  * Adaptive icons
  */
-export declare const ANDROID_LDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIcon;
 export declare const ANDROID_MDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIcon;
 export declare const ANDROID_HDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIcon;
 export declare const ANDROID_XHDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIcon;
 export declare const ANDROID_XXHDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIcon;
 export declare const ANDROID_XXXHDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIcon;
-export declare const ANDROID_LDPI_ADAPTIVE_ICON_DARK: AndroidOutputAssetTemplateAdaptiveIcon;
 export declare const ANDROID_MDPI_ADAPTIVE_ICON_DARK: AndroidOutputAssetTemplateAdaptiveIcon;
 export declare const ANDROID_HDPI_ADAPTIVE_ICON_DARK: AndroidOutputAssetTemplateAdaptiveIcon;
 export declare const ANDROID_XHDPI_ADAPTIVE_ICON_DARK: AndroidOutputAssetTemplateAdaptiveIcon;

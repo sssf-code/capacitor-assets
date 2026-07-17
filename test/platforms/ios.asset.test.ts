@@ -3,7 +3,7 @@ import { copy, pathExists, readFile, rmSync as rm } from '@ionic/utils-fs';
 import { temporaryDirectory } from 'tempy';
 
 import { Context, loadContext } from '../../src/ctx';
-import { IosAssetGenerator, IOS_SPLASH_IMAGE_SET_PATH } from '../../src/platforms/ios';
+import { IosAssetGenerator, IOS_APP_ICON_SET_PATH, IOS_SPLASH_IMAGE_SET_PATH } from '../../src/platforms/ios';
 import { AssetKind, Assets, IosContents, IosOutputAssetTemplate } from '../../src/definitions';
 import * as IosAssets from '../../src/platforms/ios/assets';
 import sharp from 'sharp';
@@ -80,10 +80,27 @@ describe('iOS Asset Test', () => {
     const strategy = new IosAssetGenerator();
     let generatedAssets = ((await assets.icon?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<IosOutputAssetTemplate>[];
+    // Light, dark, and tinted 1024px variants
+    expect(exportedIcons.length).toBe(3);
     expect(generatedAssets.length).toBe(exportedIcons.length);
 
     await verifyExists(generatedAssets);
     await verifySizes(generatedAssets);
+
+    // Contents.json must register the iOS 18 dark and tinted appearances
+    const contentsJson = JSON.parse(
+      await readFile(join(ctx.project.config.ios!.path!, IOS_APP_ICON_SET_PATH, 'Contents.json'), {
+        encoding: 'utf-8',
+      }),
+    );
+    expect(contentsJson.images.length).toBe(3);
+    const appearanceOf = (entry: any) =>
+      entry.appearances?.find((a: any) => a.appearance === 'luminosity')?.value ?? 'any';
+    expect(contentsJson.images.map(appearanceOf).sort()).toEqual(['any', 'dark', 'tinted']);
+    for (const image of contentsJson.images) {
+      expect(image.size).toBe('1024x1024');
+      expect(image.platform).toBe('ios');
+    }
   });
 });
 
@@ -148,7 +165,6 @@ describe('iOS Asset Test - Logo Only', () => {
     });
     let generatedAssets = ((await assets.logoDark?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<IosOutputAssetTemplate>[];
-
 
     // Shouldn't generate standard splash
     expect(generatedAssets.find((f) => f.asset.kind === AssetKind.Splash)).toBeUndefined();

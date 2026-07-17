@@ -5,15 +5,6 @@ import type {
 } from '../../definitions';
 import { AssetKind, AndroidDensity, Format, Orientation, Platform } from '../../definitions';
 
-export const ANDROID_LDPI_ICON: AndroidOutputAssetTemplate = {
-  platform: Platform.Android,
-  kind: AssetKind.Icon,
-  format: Format.Png,
-  width: 36,
-  height: 36,
-  density: AndroidDensity.Ldpi,
-};
-
 export const ANDROID_MDPI_ICON: AndroidOutputAssetTemplate = {
   platform: Platform.Android,
   kind: AssetKind.Icon,
@@ -102,23 +93,14 @@ export const ANDROID_NOTIFICATION_XXXHDPI_ICON: AndroidOutputAssetTemplate = {
   platform: Platform.Android,
   kind: AssetKind.NotificationIcon,
   format: Format.Png,
-  width: 144,
-  height: 144,
+  width: 96,
+  height: 96,
   density: AndroidDensity.Xxxhdpi,
 };
 
 /**
  * Adaptive icons
  */
-export const ANDROID_LDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIcon = {
-  platform: Platform.Android,
-  kind: AssetKind.AdaptiveIcon,
-  format: Format.Png,
-  width: 81,
-  height: 81,
-  density: AndroidDensity.Ldpi,
-};
-
 export const ANDROID_MDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIcon = {
   platform: Platform.Android,
   kind: AssetKind.AdaptiveIcon,
@@ -165,15 +147,6 @@ export const ANDROID_XXXHDPI_ADAPTIVE_ICON: AndroidOutputAssetTemplateAdaptiveIc
 };
 
 // Dark/night mode adaptive icons
-export const ANDROID_LDPI_ADAPTIVE_ICON_DARK: AndroidOutputAssetTemplateAdaptiveIcon = {
-  platform: Platform.Android,
-  kind: AssetKind.AdaptiveIconDark,
-  format: Format.Png,
-  width: 81,
-  height: 81,
-  density: AndroidDensity.LdpiNight,
-};
-
 export const ANDROID_MDPI_ADAPTIVE_ICON_DARK: AndroidOutputAssetTemplateAdaptiveIcon = {
   platform: Platform.Android,
   kind: AssetKind.AdaptiveIconDark,
@@ -359,7 +332,7 @@ export const ANDROID_SCREEN_DARK: AndroidOutputAssetTemplateSplash = {
   kind: AssetKind.SplashDark,
   format: Format.Png,
   width: 320,
-  height: 240,
+  height: 480,
   density: AndroidDensity.DefaultNight,
   orientation: Orientation.Default,
 };

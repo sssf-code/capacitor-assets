@@ -32,11 +32,33 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
                 return this.generateFromLogo(asset, project);
             case "icon" /* AssetKind.Icon */:
                 return this.generateIcons(asset, project);
+            case "icon-dark" /* AssetKind.IconDark */:
+                return this._generateIcons(asset, project, [IosAssetTemplates.IOS_1024_ICON_DARK]);
+            case "icon-tinted" /* AssetKind.IconTinted */:
+                return this._generateIcons(asset, project, [IosAssetTemplates.IOS_1024_ICON_TINTED]);
             case "splash" /* AssetKind.Splash */:
             case "splash-dark" /* AssetKind.SplashDark */:
                 return this.generateSplashes(asset, project);
         }
         return [];
+    }
+    /**
+     * The icon templates to generate from a primary (light) icon source.
+     * Dark/tinted variants are auto-derived unless the project provides
+     * explicit ios/icon-dark or ios/icon-tinted sources, which are then
+     * generated in their own pass.
+     */
+    iconTemplates(project) {
+        const icons = Object.values(IosAssetTemplates).filter((a) => a.kind === "icon" /* AssetKind.Icon */);
+        return icons.filter((icon) => {
+            if (icon.appearance === "dark" /* IosIconAppearance.Dark */ && project.assets?.iosIconDark) {
+                return false;
+            }
+            if (icon.appearance === "tinted" /* IosIconAppearance.Tinted */ && project.assets?.iosIconTinted) {
+                return false;
+            }
+            return true;
+        });
     }
     async generateFromLogo(asset, project) {
         const pipe = asset.pipeline();
@@ -121,19 +143,39 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         return [...logos, ...generated];
     }
     async _generateIcons(asset, project, icons) {
-        const pipe = asset.pipeline();
-        if (!pipe) {
+        if (!asset.pipeline()) {
             throw new error_1.BadPipelineError('Sharp instance not created');
         }
         const iosDir = project.config.ios?.path ?? 'App';
         const lightDefaultBackground = '#ffffff';
+        // True when the source is an explicit ios/icon-dark or ios/icon-tinted
+        // file, in which case the user's art is used as-is (no derivation).
+        const explicitVariant = asset.kind === "icon-dark" /* AssetKind.IconDark */ || asset.kind === "icon-tinted" /* AssetKind.IconTinted */;
         const generated = await Promise.all(icons.map(async (icon) => {
             const dest = (0, path_1.join)(iosDir, exports.IOS_APP_ICON_SET_PATH, icon.name);
-            const outputInfo = await pipe
-                .resize(icon.width, icon.height)
-                .png()
-                .flatten({ background: this.options.iconBackgroundColor ?? lightDefaultBackground })
-                .toFile(dest);
+            const appearance = icon.appearance ?? "any" /* IosIconAppearance.Any */;
+            // When deriving the dark variant while generating from a logo,
+            // prefer the dark logo if one was provided.
+            let sourcePath = asset.path;
+            if (appearance === "dark" /* IosIconAppearance.Dark */ && asset.kind === "logo" /* AssetKind.Logo */ && project.assets?.logoDark) {
+                sourcePath = project.assets.logoDark.path;
+            }
+            const pipe = (0, sharp_1.default)(sourcePath).resize(icon.width, icon.height);
+            if (appearance === "dark" /* IosIconAppearance.Dark */) {
+                // Dark icons keep their transparency so the system-provided
+                // dark background shows through.
+            }
+            else if (appearance === "tinted" /* IosIconAppearance.Tinted */) {
+                // Tinted icons must be fully opaque grayscale.
+                pipe.flatten({ background: this.options.iconBackgroundColor ?? lightDefaultBackground });
+                if (!explicitVariant) {
+                    pipe.greyscale();
+                }
+            }
+            else {
+                pipe.flatten({ background: this.options.iconBackgroundColor ?? lightDefaultBackground });
+            }
+            const outputInfo = await pipe.png().toFile(dest);
             return new output_asset_1.OutputAsset(icon, asset, project, {
                 [icon.name]: dest,
             }, {
@@ -145,12 +187,10 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
     }
     // Generate ALL the icons when only given a logo
     async generateIconsForLogo(asset, project) {
-        const icons = Object.values(IosAssetTemplates).filter((a) => ["icon" /* AssetKind.Icon */].find((i) => i === a.kind));
-        return this._generateIcons(asset, project, icons);
+        return this._generateIcons(asset, project, this.iconTemplates(project));
     }
     async generateIcons(asset, project) {
-        const icons = Object.values(IosAssetTemplates).filter((a) => ["icon" /* AssetKind.Icon */].find((i) => i === a.kind));
-        return this._generateIcons(asset, project, icons);
+        return this._generateIcons(asset, project, this.iconTemplates(project));
     }
     async generateSplashes(asset, project) {
         const pipe = asset.pipeline();
@@ -190,23 +230,32 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         const contentsJsonPath = (0, path_1.join)(assetsPath, 'Contents.json');
         const json = await (0, utils_fs_1.readFile)(contentsJsonPath, { encoding: 'utf-8' });
         const parsed = JSON.parse(json);
-        const withoutMissing = [];
+        // The luminosity appearance of a Contents.json image entry ('any' when absent)
+        const appearanceOf = (entry) => entry?.appearances?.find((a) => a.appearance === 'luminosity')?.value ?? "any" /* IosIconAppearance.Any */;
+        let images = (parsed.images ?? []).filter((i) => !!i.filename);
         for (const g of generated) {
-            const width = g.template.width;
-            const height = g.template.height;
-            parsed.images.map((i) => {
-                if (i.filename !== g.template.name) {
-                    (0, utils_fs_1.rmSync)((0, path_1.join)(assetsPath, i.filename));
+            const template = g.template;
+            const appearance = template.appearance ?? "any" /* IosIconAppearance.Any */;
+            // Replace any existing entries for this appearance, removing files
+            // they referenced (e.g. legacy multi-size icons from older projects)
+            for (const existing of images.filter((i) => appearanceOf(i) === appearance)) {
+                if (existing.filename !== template.name) {
+                    (0, utils_fs_1.rmSync)((0, path_1.join)(assetsPath, existing.filename), { force: true });
                 }
-            });
-            withoutMissing.push({
-                idiom: g.template.idiom,
-                size: `${width}x${height}`,
-                filename: g.template.name,
+            }
+            images = images.filter((i) => appearanceOf(i) !== appearance);
+            const entry = {
+                idiom: template.idiom,
+                size: `${template.width}x${template.height}`,
+                filename: template.name,
                 platform: "ios" /* Platform.Ios */,
-            });
+            };
+            if (appearance !== "any" /* IosIconAppearance.Any */) {
+                entry.appearances = [{ appearance: 'luminosity', value: appearance }];
+            }
+            images.push(entry);
         }
-        parsed.images = withoutMissing;
+        parsed.images = images;
         await (0, utils_fs_1.writeFile)(contentsJsonPath, JSON.stringify(parsed, null, 2));
     }
     async updateSplashContentsJson(generated, project) {

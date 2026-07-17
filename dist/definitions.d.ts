@@ -8,6 +8,8 @@ export interface Assets {
     splash: InputAsset | null;
     splashDark: InputAsset | null;
     iosIcon?: InputAsset | null;
+    iosIconDark?: InputAsset | null;
+    iosIconTinted?: InputAsset | null;
     iosSplash?: InputAsset | null;
     iosSplashDark?: InputAsset | null;
     androidIcon?: InputAsset | null;
@@ -26,6 +28,8 @@ export declare const enum AssetKind {
     AdaptiveIcon = "adaptive-icon",
     AdaptiveIconDark = "adaptive-icon-dark",
     Icon = "icon",
+    IconDark = "icon-dark",
+    IconTinted = "icon-tinted",
     IconForeground = "icon-foreground",
     IconBackground = "icon-background",
     NotificationIcon = "notification-icon",
@@ -106,6 +110,12 @@ export interface OutputAssetTemplate {
 export interface IosOutputAssetTemplate extends OutputAssetTemplate {
     name: string;
     idiom: IosIdiom;
+    appearance?: IosIconAppearance;
+}
+export declare const enum IosIconAppearance {
+    Any = "any",
+    Dark = "dark",
+    Tinted = "tinted"
 }
 export declare const enum IosIdiom {
     Universal = "universal",
@@ -123,6 +133,8 @@ export interface PwaOutputAssetTemplate extends OutputAssetTemplate {
     name: string;
     orientation?: Orientation;
     density?: string;
+    purpose?: 'any' | 'maskable';
+    excludeFromManifest?: boolean;
 }
 export interface AndroidOutputAssetTemplate extends OutputAssetTemplate {
     density: AndroidDensity;

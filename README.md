@@ -71,6 +71,49 @@ assets/
 - `assets/icon-(foreground|background).(png|jpg)` must be at least 1024×1024px
 - `assets/splash[-dark].(png|jpg)` must be at least 2732×2732px
 
+Additional platform-specific source images may be provided in `assets/ios/`, `assets/android/`, and `assets/pwa/` subdirectories to override a source for a single platform:
+
+```
+assets/
+├── ios/
+│   ├── icon.png          # iOS app icon (light appearance)
+│   ├── icon-dark.png     # optional iOS 18+ dark appearance icon (transparent background recommended)
+│   ├── icon-tinted.png   # optional iOS 18+ tinted appearance icon (opaque grayscale)
+│   ├── splash.png
+│   └── splash-dark.png
+├── android/
+│   ├── icon.png
+│   ├── icon-foreground.png
+│   ├── icon-background.png
+│   ├── notification.png  # status bar notification icon — must be a white silhouette on transparency
+│   ├── splash.png
+│   └── splash-dark.png
+└── pwa/
+    ├── icon.png
+    ├── splash.png
+    └── splash-dark.png
+```
+
+### What is generated
+
+**iOS**
+
+- A single 1024×1024 `AppIcon` (the Xcode 14+ single-size format), plus iOS 18+ **dark** and **tinted** appearance variants registered in the asset catalog. When not provided explicitly, the dark variant preserves the source's transparency and the tinted variant is derived as grayscale.
+- 2732×2732 universal light and dark launch images in `Splash.imageset` (used by Capacitor's `LaunchScreen.storyboard`).
+
+**Android**
+
+- Adaptive icons (`mipmap-*/ic_launcher_foreground.png` / `ic_launcher_background.png`) with an `ic_launcher.xml` that includes a full-bleed background and a **`<monochrome>` layer** for Android 13+ themed icons.
+- Legacy and round launcher icons for API < 26.
+- Status bar notification icons (`drawable-*/ic_stat_notification.png`, 24dp base size) when `assets/android/notification.png` is provided. Android renders these as pure silhouettes — the source must be white-on-transparent or it will appear as a solid block.
+- Splash screens per density, light and dark.
+
+**PWA**
+
+- `icon-192.png`, `icon-512.png`, `icon-1024.png` (manifest `purpose: "any"`) and `icon-512-maskable.png` (separate `purpose: "maskable"` entry, composited onto `--iconBackgroundColor` with the logo confined to the safe zone).
+- `apple-touch-icon.png` (180×180, opaque) for iOS Add to Home Screen — link it from your `index.html`.
+- `apple-splash-*` startup images for current iPhone/iPad screen sizes, light and dark. Run with `--pwaTags` to print the `<link>` tags to add to your `index.html`.
+
 To generate resources with all the default options, just run:
 
 ```shell

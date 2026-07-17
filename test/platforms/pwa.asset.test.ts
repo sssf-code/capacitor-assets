@@ -5,7 +5,7 @@ import { temporaryDirectory } from 'tempy';
 import { Context, loadContext } from '../../src/ctx';
 import { PwaAssetGenerator } from '../../src/platforms/pwa';
 import { AssetKind, PwaOutputAssetTemplate } from '../../src/definitions';
-import { ASSETS as PwaAssets } from '../../src/platforms/pwa/assets';
+import { ASSETS as PwaAssets, PWA_IOS_DEVICE_SIZES } from '../../src/platforms/pwa/assets';
 import sharp from 'sharp';
 import { isAbsolute, join, parse } from 'path';
 import { OutputAsset } from '../../src/output-asset';
@@ -55,7 +55,9 @@ describe('PWA Asset Test', () => {
     expect(sizedSet.every((e) => !!e)).toBe(true);
 
     const manifest = await strategy.getManifestJson(ctx.project);
-    expect(manifest.icons.length).toBe(7);
+    // 192, 512, 1024 (purpose any) + 512 maskable; apple-touch-icon is a
+    // file only and must not be listed in the manifest
+    expect(manifest.icons.length).toBe(4);
 
     expect(
       manifest.icons
@@ -72,10 +74,16 @@ describe('PWA Asset Test', () => {
       manifest.icons
         .map((icon: any) => {
           const ext = parse(icon.src).ext;
-          return ext === '.webp' && !isAbsolute(icon.src);
+          return ext === '.png' && !isAbsolute(icon.src);
         })
         .every((i: any) => !!i),
     ).toBe(true);
+
+    // Maskable icon must be a separate entry, not combined with "any"
+    const purposes = manifest.icons.map((icon: any) => icon.purpose);
+    expect(purposes).toContain('maskable');
+    expect(purposes).not.toContain('any maskable');
+    expect(manifest.icons.every((icon: any) => icon.type === 'image/png')).toBe(true);
   });
 
   it.skip('Should generate PWA splashes', async () => {
@@ -123,7 +131,6 @@ describe('PWA Asset Test - logo only', () => {
   it('Should update manifest with generated assets and colors from logo', async () => {
     const assets = await ctx.project.loadInputAssets();
 
-
     const strategy = new PwaAssetGenerator({
       splashBackgroundColor: '#dedbef',
     });
@@ -134,7 +141,9 @@ describe('PWA Asset Test - logo only', () => {
     const manifest = await readJSON(manifestPath);
     expect(manifest['background_color']).toBe('#dedbef');
 
-    expect(generated.length).toBe(7);
+    // All icons plus a light and dark iOS splash per device size
+    const iconCount = Object.values(PwaAssets).filter((a) => a.kind === AssetKind.Icon).length;
+    expect(generated.length).toBe(iconCount + PWA_IOS_DEVICE_SIZES.length * 2);
     await verifySizes(generated as OutputAsset<PwaOutputAssetTemplate>[]);
   });
 });

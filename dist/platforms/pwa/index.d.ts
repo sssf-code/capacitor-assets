@@ -27,5 +27,5 @@ export declare class PwaAssetGenerator extends AssetGenerator {
     private makeIconManifestEntry;
     private generateSplashes;
     private _generateSplash;
-    static logInstructions(generated: OutputAsset[]): void;
+    logInstructions(project: Project, generated: OutputAsset[]): Promise<void>;
 }

@@ -60,11 +60,10 @@ export async function run(ctx: Context): Promise<OutputAsset[]> {
         logGenerated(generated);
       }
 
-      /*
       if (!ctx.args.silent && platforms.indexOf('pwa') >= 0 && ctx.args.pwaTags) {
-        PwaAssetGenerator.logInstructions(generated);
+        const pwaGenerator = generators.find((g) => g instanceof PwaAssetGenerator) as PwaAssetGenerator | undefined;
+        await pwaGenerator?.logInstructions(ctx.project, generated);
       }
-      */
 
       return generated;
     } else {

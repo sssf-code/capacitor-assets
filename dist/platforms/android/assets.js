@@ -1,14 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ANDROID_PORT_XXXHDPI_SCREEN_DARK = exports.ANDROID_PORT_XXHDPI_SCREEN_DARK = exports.ANDROID_PORT_XHDPI_SCREEN_DARK = exports.ANDROID_PORT_HDPI_SCREEN_DARK = exports.ANDROID_PORT_MDPI_SCREEN_DARK = exports.ANDROID_PORT_LDPI_SCREEN_DARK = exports.ANDROID_LAND_XXXHDPI_SCREEN_DARK = exports.ANDROID_LAND_XXHDPI_SCREEN_DARK = exports.ANDROID_LAND_XHDPI_SCREEN_DARK = exports.ANDROID_LAND_HDPI_SCREEN_DARK = exports.ANDROID_LAND_MDPI_SCREEN_DARK = exports.ANDROID_LAND_LDPI_SCREEN_DARK = exports.ANDROID_SCREEN_DARK = exports.ANDROID_PORT_XXXHDPI_SCREEN = exports.ANDROID_PORT_XXHDPI_SCREEN = exports.ANDROID_PORT_XHDPI_SCREEN = exports.ANDROID_PORT_HDPI_SCREEN = exports.ANDROID_PORT_MDPI_SCREEN = exports.ANDROID_PORT_LDPI_SCREEN = exports.ANDROID_LAND_XXXHDPI_SCREEN = exports.ANDROID_LAND_XXHDPI_SCREEN = exports.ANDROID_LAND_XHDPI_SCREEN = exports.ANDROID_LAND_HDPI_SCREEN = exports.ANDROID_LAND_MDPI_SCREEN = exports.ANDROID_LAND_LDPI_SCREEN = exports.ANDROID_SCREEN = exports.ANDROID_XXXHDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_XXHDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_XHDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_HDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_MDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_LDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_XXXHDPI_ADAPTIVE_ICON = exports.ANDROID_XXHDPI_ADAPTIVE_ICON = exports.ANDROID_XHDPI_ADAPTIVE_ICON = exports.ANDROID_HDPI_ADAPTIVE_ICON = exports.ANDROID_MDPI_ADAPTIVE_ICON = exports.ANDROID_LDPI_ADAPTIVE_ICON = exports.ANDROID_NOTIFICATION_XXXHDPI_ICON = exports.ANDROID_NOTIFICATION_XXHDPI_ICON = exports.ANDROID_NOTIFICATION_XHDPI_ICON = exports.ANDROID_NOTIFICATION_HDPI_ICON = exports.ANDROID_NOTIFICATION_MDPI_ICON = exports.ANDROID_XXXHDPI_ICON = exports.ANDROID_XXHDPI_ICON = exports.ANDROID_XHDPI_ICON = exports.ANDROID_HDPI_ICON = exports.ANDROID_MDPI_ICON = exports.ANDROID_LDPI_ICON = void 0;
-exports.ANDROID_LDPI_ICON = {
-    platform: "android" /* Platform.Android */,
-    kind: "icon" /* AssetKind.Icon */,
-    format: "png" /* Format.Png */,
-    width: 36,
-    height: 36,
-    density: "ldpi" /* AndroidDensity.Ldpi */,
-};
+exports.ANDROID_PORT_XXXHDPI_SCREEN_DARK = exports.ANDROID_PORT_XXHDPI_SCREEN_DARK = exports.ANDROID_PORT_XHDPI_SCREEN_DARK = exports.ANDROID_PORT_HDPI_SCREEN_DARK = exports.ANDROID_PORT_MDPI_SCREEN_DARK = exports.ANDROID_PORT_LDPI_SCREEN_DARK = exports.ANDROID_LAND_XXXHDPI_SCREEN_DARK = exports.ANDROID_LAND_XXHDPI_SCREEN_DARK = exports.ANDROID_LAND_XHDPI_SCREEN_DARK = exports.ANDROID_LAND_HDPI_SCREEN_DARK = exports.ANDROID_LAND_MDPI_SCREEN_DARK = exports.ANDROID_LAND_LDPI_SCREEN_DARK = exports.ANDROID_SCREEN_DARK = exports.ANDROID_PORT_XXXHDPI_SCREEN = exports.ANDROID_PORT_XXHDPI_SCREEN = exports.ANDROID_PORT_XHDPI_SCREEN = exports.ANDROID_PORT_HDPI_SCREEN = exports.ANDROID_PORT_MDPI_SCREEN = exports.ANDROID_PORT_LDPI_SCREEN = exports.ANDROID_LAND_XXXHDPI_SCREEN = exports.ANDROID_LAND_XXHDPI_SCREEN = exports.ANDROID_LAND_XHDPI_SCREEN = exports.ANDROID_LAND_HDPI_SCREEN = exports.ANDROID_LAND_MDPI_SCREEN = exports.ANDROID_LAND_LDPI_SCREEN = exports.ANDROID_SCREEN = exports.ANDROID_XXXHDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_XXHDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_XHDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_HDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_MDPI_ADAPTIVE_ICON_DARK = exports.ANDROID_XXXHDPI_ADAPTIVE_ICON = exports.ANDROID_XXHDPI_ADAPTIVE_ICON = exports.ANDROID_XHDPI_ADAPTIVE_ICON = exports.ANDROID_HDPI_ADAPTIVE_ICON = exports.ANDROID_MDPI_ADAPTIVE_ICON = exports.ANDROID_NOTIFICATION_XXXHDPI_ICON = exports.ANDROID_NOTIFICATION_XXHDPI_ICON = exports.ANDROID_NOTIFICATION_XHDPI_ICON = exports.ANDROID_NOTIFICATION_HDPI_ICON = exports.ANDROID_NOTIFICATION_MDPI_ICON = exports.ANDROID_XXXHDPI_ICON = exports.ANDROID_XXHDPI_ICON = exports.ANDROID_XHDPI_ICON = exports.ANDROID_HDPI_ICON = exports.ANDROID_MDPI_ICON = void 0;
 exports.ANDROID_MDPI_ICON = {
     platform: "android" /* Platform.Android */,
     kind: "icon" /* AssetKind.Icon */,
@@ -88,21 +80,13 @@ exports.ANDROID_NOTIFICATION_XXXHDPI_ICON = {
     platform: "android" /* Platform.Android */,
     kind: "notification-icon" /* AssetKind.NotificationIcon */,
     format: "png" /* Format.Png */,
-    width: 144,
-    height: 144,
+    width: 96,
+    height: 96,
     density: "xxxhdpi" /* AndroidDensity.Xxxhdpi */,
 };
 /**
  * Adaptive icons
  */
-exports.ANDROID_LDPI_ADAPTIVE_ICON = {
-    platform: "android" /* Platform.Android */,
-    kind: "adaptive-icon" /* AssetKind.AdaptiveIcon */,
-    format: "png" /* Format.Png */,
-    width: 81,
-    height: 81,
-    density: "ldpi" /* AndroidDensity.Ldpi */,
-};
 exports.ANDROID_MDPI_ADAPTIVE_ICON = {
     platform: "android" /* Platform.Android */,
     kind: "adaptive-icon" /* AssetKind.AdaptiveIcon */,
@@ -144,14 +128,6 @@ exports.ANDROID_XXXHDPI_ADAPTIVE_ICON = {
     density: "xxxhdpi" /* AndroidDensity.Xxxhdpi */,
 };
 // Dark/night mode adaptive icons
-exports.ANDROID_LDPI_ADAPTIVE_ICON_DARK = {
-    platform: "android" /* Platform.Android */,
-    kind: "adaptive-icon-dark" /* AssetKind.AdaptiveIconDark */,
-    format: "png" /* Format.Png */,
-    width: 81,
-    height: 81,
-    density: "night-ldpi" /* AndroidDensity.LdpiNight */,
-};
 exports.ANDROID_MDPI_ADAPTIVE_ICON_DARK = {
     platform: "android" /* Platform.Android */,
     kind: "adaptive-icon-dark" /* AssetKind.AdaptiveIconDark */,
@@ -318,7 +294,7 @@ exports.ANDROID_SCREEN_DARK = {
     kind: "splash-dark" /* AssetKind.SplashDark */,
     format: "png" /* Format.Png */,
     width: 320,
-    height: 240,
+    height: 480,
     density: "night" /* AndroidDensity.DefaultNight */,
     orientation: "" /* Orientation.Default */,
 };

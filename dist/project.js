@@ -45,14 +45,19 @@ class Project extends project_1.MobileProject {
             splash: await this.loadInputAsset('splash', "splash" /* AssetKind.Splash */, "any" /* Platform.Any */),
             splashDark: await this.loadInputAsset('splash-dark', "splash-dark" /* AssetKind.SplashDark */, "any" /* Platform.Any */),
             iosIcon: await this.loadInputAsset('ios/icon', "icon" /* AssetKind.Icon */, "ios" /* Platform.Ios */),
+            iosIconDark: await this.loadInputAsset('ios/icon-dark', "icon-dark" /* AssetKind.IconDark */, "ios" /* Platform.Ios */),
+            iosIconTinted: await this.loadInputAsset('ios/icon-tinted', "icon-tinted" /* AssetKind.IconTinted */, "ios" /* Platform.Ios */),
             iosSplash: await this.loadInputAsset('ios/splash', "splash" /* AssetKind.Splash */, "ios" /* Platform.Ios */),
             iosSplashDark: await this.loadInputAsset('ios/splash-dark', "splash-dark" /* AssetKind.SplashDark */, "ios" /* Platform.Ios */),
             androidIcon: await this.loadInputAsset('android/icon', "icon" /* AssetKind.Icon */, "android" /* Platform.Android */),
-            androidIconForeground: await this.loadInputAsset('android/icon-foreground', "icon" /* AssetKind.Icon */, "android" /* Platform.Android */),
-            androidIconBackground: await this.loadInputAsset('android/icon-background', "icon" /* AssetKind.Icon */, "android" /* Platform.Android */),
+            androidIconForeground: await this.loadInputAsset('android/icon-foreground', "icon-foreground" /* AssetKind.IconForeground */, "android" /* Platform.Android */),
+            androidIconBackground: await this.loadInputAsset('android/icon-background', "icon-background" /* AssetKind.IconBackground */, "android" /* Platform.Android */),
             androidSplash: await this.loadInputAsset('android/splash', "splash" /* AssetKind.Splash */, "android" /* Platform.Android */),
             androidSplashDark: await this.loadInputAsset('android/splash-dark', "splash-dark" /* AssetKind.SplashDark */, "android" /* Platform.Android */),
             androidNotificationIcon: await this.loadInputAsset('android/notification', "notification-icon" /* AssetKind.NotificationIcon */, "android" /* Platform.Android */),
+            pwaIcon: await this.loadInputAsset('pwa/icon', "icon" /* AssetKind.Icon */, "pwa" /* Platform.Pwa */),
+            pwaSplash: await this.loadInputAsset('pwa/splash', "splash" /* AssetKind.Splash */, "pwa" /* Platform.Pwa */),
+            pwaSplashDark: await this.loadInputAsset('pwa/splash-dark', "splash-dark" /* AssetKind.SplashDark */, "pwa" /* Platform.Pwa */),
         };
         return this.assets;
     }
