@@ -1,5 +1,5 @@
 {
-  "name": "@capacitor/assets",
+  "name": "sssf-capacitor-assets",
   "version": "4.0.0",
   "packageManager": "pnpm@11.13.1",
   "description": "Generate icon and splash screen images for Capacitor apps",
