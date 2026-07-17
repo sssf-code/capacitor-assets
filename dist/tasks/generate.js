@@ -60,14 +60,13 @@ async function run(ctx) {
     return [];
 }
 async function verifyPlatformFolders(platforms, project) {
-    var _a, _b;
     if (platforms.indexOf('ios') >= 0 && !(await project.iosExists())) {
         platforms.splice(platforms.indexOf('ios'), 1);
-        log_1.logger.warn(`iOS platform not found at ${((_a = project.config.ios) === null || _a === void 0 ? void 0 : _a.path) || ''}, skipping iOS generation`);
+        log_1.logger.warn(`iOS platform not found at ${project.config.ios?.path || ''}, skipping iOS generation`);
     }
     if (platforms.indexOf('android') >= 0 && !(await project.androidExists())) {
         platforms.splice(platforms.indexOf('android'), 1);
-        log_1.logger.warn(`Android platform not found at ${((_b = project.config.android) === null || _b === void 0 ? void 0 : _b.path) || ''}, skipping android generation`);
+        log_1.logger.warn(`Android platform not found at ${project.config.android?.path || ''}, skipping android generation`);
     }
 }
 async function generateAssets(assets, generators, project) {
@@ -105,7 +104,7 @@ function logGenerated(generated) {
         Object.keys(g.destFilenames).forEach((name) => {
             const filename = g.getDestFilename(name);
             const outputInfo = g.getOutputInfo(name);
-            (0, log_1.log)(`${c.strong(c.success('CREATE'))} ${c.strong(c.extra(g.template.platform))} ${c.weak(g.template.kind)} ${filename !== null && filename !== void 0 ? filename : ''}${outputInfo ? ` (${size(outputInfo.size)})` : ''}`);
+            (0, log_1.log)(`${c.strong(c.success('CREATE'))} ${c.strong(c.extra(g.template.platform))} ${c.weak(g.template.kind)} ${filename ?? ''}${outputInfo ? ` (${size(outputInfo.size)})` : ''}`);
         });
     }
     (0, log_1.log)('\n');

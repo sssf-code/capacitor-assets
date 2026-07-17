@@ -19,8 +19,7 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         super(options);
     }
     async generate(asset, project) {
-        var _a;
-        const iosDir = (_a = project.config.ios) === null || _a === void 0 ? void 0 : _a.path;
+        const iosDir = project.config.ios?.path;
         if (!iosDir) {
             throw new error_1.BadProjectError('No ios project found');
         }
@@ -40,20 +39,19 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         return [];
     }
     async generateFromLogo(asset, project) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         const pipe = asset.pipeline();
         if (!pipe) {
             throw new error_1.BadPipelineError('Sharp instance not created');
         }
-        const iosDir = (_b = (_a = project.config.ios) === null || _a === void 0 ? void 0 : _a.path) !== null && _b !== void 0 ? _b : 'App';
+        const iosDir = project.config.ios?.path ?? 'App';
         // Generate logos
         let logos = [];
         if (asset.kind === "logo" /* AssetKind.Logo */) {
             logos = await this.generateIconsForLogo(asset, project);
         }
         const generated = [];
-        const targetLogoWidthPercent = (_c = this.options.logoSplashScale) !== null && _c !== void 0 ? _c : 0.2;
-        const targetWidth = (_d = this.options.logoSplashTargetWidth) !== null && _d !== void 0 ? _d : Math.floor(((_e = asset.width) !== null && _e !== void 0 ? _e : 0) * targetLogoWidthPercent);
+        const targetLogoWidthPercent = this.options.logoSplashScale ?? 0.2;
+        const targetWidth = this.options.logoSplashTargetWidth ?? Math.floor((asset.width ?? 0) * targetLogoWidthPercent);
         if (asset.kind === "logo" /* AssetKind.Logo */) {
             // Generate light splash
             const lightDefaultBackground = '#ffffff';
@@ -67,10 +65,10 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
                 const lightDest = (0, path_1.join)(iosDir, exports.IOS_SPLASH_IMAGE_SET_PATH, lightSplash.name);
                 const canvas = (0, sharp_1.default)({
                     create: {
-                        width: (_f = lightSplash.width) !== null && _f !== void 0 ? _f : 0,
-                        height: (_g = lightSplash.height) !== null && _g !== void 0 ? _g : 0,
+                        width: lightSplash.width ?? 0,
+                        height: lightSplash.height ?? 0,
                         channels: 4,
-                        background: (_h = this.options.splashBackgroundColor) !== null && _h !== void 0 ? _h : lightDefaultBackground,
+                        background: this.options.splashBackgroundColor ?? lightDefaultBackground,
                     },
                 });
                 const resized = await (0, sharp_1.default)(asset.path).resize(targetWidth).toBuffer();
@@ -100,10 +98,10 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
             const darkDest = (0, path_1.join)(iosDir, exports.IOS_SPLASH_IMAGE_SET_PATH, darkSplash.name);
             const canvas = (0, sharp_1.default)({
                 create: {
-                    width: (_j = darkSplash.width) !== null && _j !== void 0 ? _j : 0,
-                    height: (_k = darkSplash.height) !== null && _k !== void 0 ? _k : 0,
+                    width: darkSplash.width ?? 0,
+                    height: darkSplash.height ?? 0,
                     channels: 4,
-                    background: (_l = this.options.splashBackgroundColorDark) !== null && _l !== void 0 ? _l : darkDefaultBackground,
+                    background: this.options.splashBackgroundColorDark ?? darkDefaultBackground,
                 },
             });
             const resized = await (0, sharp_1.default)(asset.path).resize(targetWidth).toBuffer();
@@ -123,20 +121,18 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         return [...logos, ...generated];
     }
     async _generateIcons(asset, project, icons) {
-        var _a, _b;
         const pipe = asset.pipeline();
         if (!pipe) {
             throw new error_1.BadPipelineError('Sharp instance not created');
         }
-        const iosDir = (_b = (_a = project.config.ios) === null || _a === void 0 ? void 0 : _a.path) !== null && _b !== void 0 ? _b : 'App';
+        const iosDir = project.config.ios?.path ?? 'App';
         const lightDefaultBackground = '#ffffff';
         const generated = await Promise.all(icons.map(async (icon) => {
-            var _a;
             const dest = (0, path_1.join)(iosDir, exports.IOS_APP_ICON_SET_PATH, icon.name);
             const outputInfo = await pipe
                 .resize(icon.width, icon.height)
                 .png()
-                .flatten({ background: (_a = this.options.iconBackgroundColor) !== null && _a !== void 0 ? _a : lightDefaultBackground })
+                .flatten({ background: this.options.iconBackgroundColor ?? lightDefaultBackground })
                 .toFile(dest);
             return new output_asset_1.OutputAsset(icon, asset, project, {
                 [icon.name]: dest,
@@ -157,7 +153,6 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         return this._generateIcons(asset, project, icons);
     }
     async generateSplashes(asset, project) {
-        var _a, _b;
         const pipe = asset.pipeline();
         if (!pipe) {
             throw new error_1.BadPipelineError('Sharp instance not created');
@@ -171,7 +166,7 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
             ];
         const generated = [];
         for (const assetMeta of assetMetas) {
-            const iosDir = (_b = (_a = project.config.ios) === null || _a === void 0 ? void 0 : _a.path) !== null && _b !== void 0 ? _b : 'App';
+            const iosDir = project.config.ios?.path ?? 'App';
             const dest = (0, path_1.join)(iosDir, exports.IOS_SPLASH_IMAGE_SET_PATH, assetMeta.name);
             const outputInfo = await pipe.resize(assetMeta.width, assetMeta.height).png().toFile(dest);
             const g = new output_asset_1.OutputAsset(assetMeta, asset, project, {
@@ -191,8 +186,7 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         return generated;
     }
     async updateIconsContentsJson(generated, project) {
-        var _a, _b;
-        const assetsPath = (0, path_1.join)((_b = (_a = project.config.ios) === null || _a === void 0 ? void 0 : _a.path) !== null && _b !== void 0 ? _b : 'App', exports.IOS_APP_ICON_SET_PATH);
+        const assetsPath = (0, path_1.join)(project.config.ios?.path ?? 'App', exports.IOS_APP_ICON_SET_PATH);
         const contentsJsonPath = (0, path_1.join)(assetsPath, 'Contents.json');
         const json = await (0, utils_fs_1.readFile)(contentsJsonPath, { encoding: 'utf-8' });
         const parsed = JSON.parse(json);
@@ -216,8 +210,7 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         await (0, utils_fs_1.writeFile)(contentsJsonPath, JSON.stringify(parsed, null, 2));
     }
     async updateSplashContentsJson(generated, project) {
-        var _a, _b, _c;
-        const contentsJsonPath = (0, path_1.join)((_b = (_a = project.config.ios) === null || _a === void 0 ? void 0 : _a.path) !== null && _b !== void 0 ? _b : 'App', exports.IOS_SPLASH_IMAGE_SET_PATH, 'Contents.json');
+        const contentsJsonPath = (0, path_1.join)(project.config.ios?.path ?? 'App', exports.IOS_SPLASH_IMAGE_SET_PATH, 'Contents.json');
         const json = await (0, utils_fs_1.readFile)(contentsJsonPath, { encoding: 'utf-8' });
         const parsed = JSON.parse(json);
         const withoutMissing = parsed.images.filter((i) => !!i.filename);
@@ -229,7 +222,7 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
             else {
                 withoutMissing.push({
                     idiom: 'universal',
-                    scale: `${(_c = g.template.scale) !== null && _c !== void 0 ? _c : 1}x`,
+                    scale: `${g.template.scale ?? 1}x`,
                     filename: g.template.name,
                 });
             }
@@ -238,8 +231,7 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
         await (0, utils_fs_1.writeFile)(contentsJsonPath, JSON.stringify(parsed, null, 2));
     }
     async updateSplashContentsJsonDark(generated, project) {
-        var _a, _b, _c;
-        const contentsJsonPath = (0, path_1.join)((_b = (_a = project.config.ios) === null || _a === void 0 ? void 0 : _a.path) !== null && _b !== void 0 ? _b : 'App', exports.IOS_SPLASH_IMAGE_SET_PATH, 'Contents.json');
+        const contentsJsonPath = (0, path_1.join)(project.config.ios?.path ?? 'App', exports.IOS_SPLASH_IMAGE_SET_PATH, 'Contents.json');
         const json = await (0, utils_fs_1.readFile)(contentsJsonPath, { encoding: 'utf-8' });
         const parsed = JSON.parse(json);
         const withoutMissing = parsed.images.filter((i) => !!i.filename);
@@ -257,7 +249,7 @@ class IosAssetGenerator extends asset_generator_1.AssetGenerator {
                         },
                     ],
                     idiom: 'universal',
-                    scale: `${(_c = g.template.scale) !== null && _c !== void 0 ? _c : 1}x`,
+                    scale: `${g.template.scale ?? 1}x`,
                     filename: g.template.name,
                 });
             }

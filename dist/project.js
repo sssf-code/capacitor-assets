@@ -7,11 +7,13 @@ const path_1 = require("path");
 const input_asset_1 = require("./input-asset");
 const log_1 = require("./util/log");
 class Project extends project_1.MobileProject {
+    assetPath;
+    assets = null;
+    directory = null;
+    assetDir;
     constructor(projectRoot = process.cwd(), config, assetPath = 'assets') {
         super(projectRoot, config);
         this.assetPath = assetPath;
-        this.assets = null;
-        this.directory = null;
         this.directory = projectRoot;
         this.assetDir = (0, path_1.join)(projectRoot, assetPath);
         this.detectAssetDir();
@@ -22,12 +24,10 @@ class Project extends project_1.MobileProject {
         }
     }
     async androidExists() {
-        var _a, _b;
-        return ((_a = this.config.android) === null || _a === void 0 ? void 0 : _a.path) !== undefined && (await (0, utils_fs_1.pathExists)((_b = this.config.android) === null || _b === void 0 ? void 0 : _b.path));
+        return this.config.android?.path !== undefined && (await (0, utils_fs_1.pathExists)(this.config.android?.path));
     }
     async iosExists() {
-        var _a, _b;
-        return ((_a = this.config.ios) === null || _a === void 0 ? void 0 : _a.path) !== undefined && (await (0, utils_fs_1.pathExists)((_b = this.config.ios) === null || _b === void 0 ? void 0 : _b.path));
+        return this.config.ios?.path !== undefined && (await (0, utils_fs_1.pathExists)(this.config.ios?.path));
     }
     async assetDirExists() {
         return (0, utils_fs_1.pathExists)(this.assetDir);

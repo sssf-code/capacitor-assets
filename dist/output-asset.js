@@ -5,6 +5,11 @@ exports.OutputAsset = void 0;
  * An instance of a generated asset
  */
 class OutputAsset {
+    template;
+    asset;
+    project;
+    destFilenames;
+    outputInfoMap;
     constructor(template, asset, project, destFilenames, outputInfoMap) {
         this.template = template;
         this.asset = asset;

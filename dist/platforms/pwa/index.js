@@ -17,13 +17,11 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         super(options);
     }
     async getManifestJson(project) {
-        var _a;
-        const path = await this.getManifestJsonPath((_a = project.directory) !== null && _a !== void 0 ? _a : '');
+        const path = await this.getManifestJsonPath(project.directory ?? '');
         const contents = await (0, utils_fs_1.readFile)(path, { encoding: 'utf-8' });
         return JSON.parse(contents);
     }
     async getSplashSizes() {
-        var _a;
         const appleInterfacePage = `https://developer.apple.com/design/human-interface-guidelines/foundations/layout/`;
         let assetSizes = assets_1.PWA_IOS_DEVICE_SIZES;
         if (!this.options.pwaNoAppleFetch) {
@@ -32,7 +30,7 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
                 const html = await res.text();
                 const doc = (0, node_html_parser_1.default)(html);
                 const target = doc.querySelector('main > section .row > .column table');
-                const sizes = (_a = target === null || target === void 0 ? void 0 : target.querySelectorAll('tr > td:nth-child(2)')) !== null && _a !== void 0 ? _a : [];
+                const sizes = target?.querySelectorAll('tr > td:nth-child(2)') ?? [];
                 const sizeStrings = sizes.map((td) => {
                     const t = td.innerText;
                     return t
@@ -87,14 +85,13 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         return [...logos, ...generated];
     }
     async _generateSplashFromLogo(project, asset, sizeString) {
-        var _a, _b, _c;
         const parts = sizeString.split('@');
         const sizeParts = parts[0].split('x');
         const width = parseFloat(sizeParts[0]);
         const height = parseFloat(sizeParts[1]);
         const density = parts[1];
         const generated = [];
-        const pwaDir = await this.getPWADirectory((_a = project.directory) !== null && _a !== void 0 ? _a : undefined);
+        const pwaDir = await this.getPWADirectory(project.directory ?? undefined);
         const pwaAssetDir = await this.getPWAAssetsDirectory(pwaDir);
         const destDir = (0, path_1.join)(pwaAssetDir, exports.PWA_ASSET_PATH);
         try {
@@ -106,8 +103,8 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         }
         // TODO: In the future, add size checks to ensure canvas image
         // is not exceeded (see Android splash generation)
-        const targetLogoWidthPercent = (_b = this.options.logoSplashScale) !== null && _b !== void 0 ? _b : 0.2;
-        const targetWidth = (_c = this.options.logoSplashTargetWidth) !== null && _c !== void 0 ? _c : Math.floor(width * targetLogoWidthPercent);
+        const targetLogoWidthPercent = this.options.logoSplashScale ?? 0.2;
+        const targetWidth = this.options.logoSplashTargetWidth ?? Math.floor(width * targetLogoWidthPercent);
         if (asset.kind === "logo" /* AssetKind.Logo */) {
             // Generate light splash
             const lightDefaultBackground = '#ffffff';
@@ -177,12 +174,11 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         return generated;
     }
     async generateIcons(asset, project) {
-        var _a;
         const pipe = asset.pipeline();
         if (!pipe) {
             throw new error_1.BadPipelineError('Sharp instance not created');
         }
-        const pwaDir = await this.getPWADirectory((_a = project.directory) !== null && _a !== void 0 ? _a : undefined);
+        const pwaDir = await this.getPWADirectory(project.directory ?? undefined);
         const icons = Object.values(assets_1.ASSETS).filter((a) => a.kind === "icon" /* AssetKind.Icon */);
         const generatedAssets = await Promise.all(icons.map(async (icon) => {
             const destDir = (0, path_1.join)(await this.getPWAAssetsDirectory(pwaDir), exports.PWA_ASSET_PATH);
@@ -204,27 +200,27 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         return generatedAssets;
     }
     async getPWADirectory(projectRoot) {
-        if (await (0, utils_fs_1.pathExists)((0, path_1.join)(projectRoot !== null && projectRoot !== void 0 ? projectRoot : '', 'public')) /* React */) {
-            return (0, path_1.join)(projectRoot !== null && projectRoot !== void 0 ? projectRoot : '', 'public');
+        if (await (0, utils_fs_1.pathExists)((0, path_1.join)(projectRoot ?? '', 'public')) /* React */) {
+            return (0, path_1.join)(projectRoot ?? '', 'public');
         }
-        else if (await (0, utils_fs_1.pathExists)((0, path_1.join)(projectRoot !== null && projectRoot !== void 0 ? projectRoot : '', 'src')) /* Angular and Vue */) {
-            return (0, path_1.join)(projectRoot !== null && projectRoot !== void 0 ? projectRoot : '', 'src');
+        else if (await (0, utils_fs_1.pathExists)((0, path_1.join)(projectRoot ?? '', 'src')) /* Angular and Vue */) {
+            return (0, path_1.join)(projectRoot ?? '', 'src');
         }
-        else if (await (0, utils_fs_1.pathExists)((0, path_1.join)(projectRoot !== null && projectRoot !== void 0 ? projectRoot : '', 'www'))) {
-            return (0, path_1.join)(projectRoot !== null && projectRoot !== void 0 ? projectRoot : '', 'www');
+        else if (await (0, utils_fs_1.pathExists)((0, path_1.join)(projectRoot ?? '', 'www'))) {
+            return (0, path_1.join)(projectRoot ?? '', 'www');
         }
         else {
-            return (0, path_1.join)(projectRoot !== null && projectRoot !== void 0 ? projectRoot : '', 'www');
+            return (0, path_1.join)(projectRoot ?? '', 'www');
         }
     }
     async getPWAAssetsDirectory(pwaDir) {
-        if (await (0, utils_fs_1.pathExists)((0, path_1.join)(pwaDir !== null && pwaDir !== void 0 ? pwaDir : '', 'assets'))) {
-            return (0, path_1.join)(pwaDir !== null && pwaDir !== void 0 ? pwaDir : '', 'assets');
+        if (await (0, utils_fs_1.pathExists)((0, path_1.join)(pwaDir ?? '', 'assets'))) {
+            return (0, path_1.join)(pwaDir ?? '', 'assets');
         }
         return '';
     }
     async getManifestJsonPath(projectRoot) {
-        const r = (p) => (0, path_1.join)(projectRoot !== null && projectRoot !== void 0 ? projectRoot : '', p);
+        const r = (p) => (0, path_1.join)(projectRoot ?? '', p);
         if (this.options.pwaManifestPath) {
             return r(this.options.pwaManifestPath);
         }
@@ -255,10 +251,9 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         }
     }
     async updateManifest(project, assets) {
-        var _a, _b;
-        const pwaDir = await this.getPWADirectory((_a = project.directory) !== null && _a !== void 0 ? _a : undefined);
+        const pwaDir = await this.getPWADirectory(project.directory ?? undefined);
         const pwaAssetDir = await this.getPWAAssetsDirectory(pwaDir);
-        const manifestPath = await this.getManifestJsonPath((_b = project.directory) !== null && _b !== void 0 ? _b : undefined);
+        const manifestPath = await this.getManifestJsonPath(project.directory ?? undefined);
         const pwaAssets = assets.filter((a) => a.template.platform === "pwa" /* Platform.Pwa */);
         let manifestJson = {};
         if (await (0, utils_fs_1.pathExists)(manifestPath)) {
@@ -326,14 +321,13 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         return Promise.all(assetSizes.map((a) => this._generateSplash(project, asset, a, pipe)));
     }
     async _generateSplash(project, asset, sizeString, pipe) {
-        var _a;
         const parts = sizeString.split('@');
         const sizeParts = parts[0].split('x');
         const width = parseFloat(sizeParts[0]);
         const height = parseFloat(sizeParts[1]);
         const density = parts[1];
         const name = `apple-splash-${width}-${height}@${density}${asset.kind === "splash-dark" /* AssetKind.SplashDark */ ? '-dark' : ''}.png`;
-        const pwaDir = await this.getPWADirectory((_a = project.directory) !== null && _a !== void 0 ? _a : undefined);
+        const pwaDir = await this.getPWADirectory(project.directory ?? undefined);
         const pwaAssetDir = await this.getPWAAssetsDirectory(pwaDir);
         const destDir = (0, path_1.join)(pwaAssetDir, exports.PWA_ASSET_PATH);
         try {
@@ -362,46 +356,45 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         return splashOutput;
     }
     static logInstructions(generated) {
-        var _a, _b, _c, _d, _e, _f;
         (0, log_1.log)(`PWA instructions:
 
 Add the following tags to your index.html to support PWA icons:
 `);
         const pwaAssets = generated.filter((g) => g.template.platform === "pwa" /* Platform.Pwa */);
         const mainIcon = pwaAssets.find((g) => g.template.width == 512 && g.template.kind === "icon" /* AssetKind.Icon */);
-        (0, log_1.log)(`<link rel="apple-touch-icon" href="${Object.values((_a = mainIcon === null || mainIcon === void 0 ? void 0 : mainIcon.destFilenames) !== null && _a !== void 0 ? _a : {})[0]}">`);
+        (0, log_1.log)(`<link rel="apple-touch-icon" href="${Object.values(mainIcon?.destFilenames ?? {})[0]}">`);
         for (const g of pwaAssets.filter((a) => a.template.kind === "icon" /* AssetKind.Icon */)) {
             const w = g.template.width;
             const h = g.template.height;
-            const path = (_b = Object.values(g.destFilenames)[0]) !== null && _b !== void 0 ? _b : '';
+            const path = Object.values(g.destFilenames)[0] ?? '';
             (0, log_1.log)(`<link rel="apple-touch-icon" sizes="${w}x${h}" href="${path}">`);
         }
         for (const g of pwaAssets.filter((a) => a.template.kind === "splash" /* AssetKind.Splash */)) {
             const template = g.template;
             const w = g.template.width;
             const h = g.template.height;
-            const path = (_c = Object.values(g.destFilenames)[0]) !== null && _c !== void 0 ? _c : '';
+            const path = Object.values(g.destFilenames)[0] ?? '';
             (0, log_1.log)(`<link rel="apple-touch-startup-image" href="${path}" media="(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${template.density}) and (orientation: ${"portrait" /* Orientation.Portrait */})>`);
         }
         for (const g of pwaAssets.filter((a) => a.template.kind === "splash" /* AssetKind.Splash */)) {
             const template = g.template;
             const w = g.template.width;
             const h = g.template.height;
-            const path = (_d = Object.values(g.destFilenames)[0]) !== null && _d !== void 0 ? _d : '';
+            const path = Object.values(g.destFilenames)[0] ?? '';
             (0, log_1.log)(`<link rel="apple-touch-startup-image" href="${path}" media="(device-width: ${h}px) and (device-height: ${w}px) and (-webkit-device-pixel-ratio: ${template.density}) and (orientation: ${"landscape" /* Orientation.Landscape */})>`);
         }
         for (const g of pwaAssets.filter((a) => a.template.kind === "splash-dark" /* AssetKind.SplashDark */)) {
             const template = g.template;
             const w = g.template.width;
             const h = g.template.height;
-            const path = (_e = Object.values(g.destFilenames)[0]) !== null && _e !== void 0 ? _e : '';
+            const path = Object.values(g.destFilenames)[0] ?? '';
             (0, log_1.log)(`<link rel="apple-touch-startup-image" href="${path}" media="(prefers-color-scheme: dark) and (device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${template.density}) and (orientation: ${"portrait" /* Orientation.Portrait */})>`);
         }
         for (const g of pwaAssets.filter((a) => a.template.kind === "splash-dark" /* AssetKind.SplashDark */)) {
             const template = g.template;
             const w = g.template.width;
             const h = g.template.height;
-            const path = (_f = Object.values(g.destFilenames)[0]) !== null && _f !== void 0 ? _f : '';
+            const path = Object.values(g.destFilenames)[0] ?? '';
             (0, log_1.log)(`<link rel="apple-touch-startup-image" href="${path}" media="(prefers-color-scheme: dark) and (device-width: ${h}px) and (device-height: ${w}px) and (-webkit-device-pixel-ratio: ${template.density}) and (orientation: ${"landscape" /* Orientation.Landscape */})>`);
         }
         console.log('Generated', pwaAssets.filter((a) => a.template.kind === "splash" /* AssetKind.Splash */).length, pwaAssets.filter((a) => a.template.kind === "splash-dark" /* AssetKind.SplashDark */).length);

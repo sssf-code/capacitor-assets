@@ -9,16 +9,21 @@ const sharp_1 = tslib_1.__importDefault(require("sharp"));
  * a number of output assets.
  */
 class InputAsset {
+    path;
+    kind;
+    platform;
+    filename;
+    width;
+    height;
+    _sharp = null;
     constructor(path, kind, platform) {
         this.path = path;
         this.kind = kind;
         this.platform = platform;
-        this._sharp = null;
         this.filename = (0, path_1.basename)(path);
     }
     pipeline() {
-        var _a;
-        return (_a = this._sharp) === null || _a === void 0 ? void 0 : _a.clone();
+        return this._sharp?.clone();
     }
     format() {
         const ext = (0, path_1.extname)(this.filename);

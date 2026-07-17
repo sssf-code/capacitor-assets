@@ -66,7 +66,7 @@ function runProgram(ctx) {
         */
         .action((0, cli_1.wrapAction)(async (args = {}) => {
         (0, ctx_1.setArguments)(ctx, args);
-        const { run } = await Promise.resolve().then(() => tslib_1.__importStar(require('./tasks/generate')));
+        const { run } = await import('./tasks/generate.js');
         await run(ctx);
     }));
     program.arguments('[command]').action(

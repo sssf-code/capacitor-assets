@@ -95,7 +95,7 @@ export function runProgram(ctx: Context): void {
       wrapAction(async (args = {}) => {
         setArguments(ctx, args);
 
-        const { run } = await import('./tasks/generate');
+        const { run } = await import('./tasks/generate.js');
         await run(ctx);
       }),
     );

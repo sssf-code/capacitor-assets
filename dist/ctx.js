@@ -8,12 +8,11 @@ const yargs_1 = tslib_1.__importDefault(require("yargs"));
 const helpers_1 = require("yargs/helpers");
 const project_1 = require("./project");
 async function loadContext(projectRootPath) {
-    var _a;
     const rootDir = process.cwd();
     const argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv)).parseSync();
     let project;
     try {
-        project = await loadProject(argv, projectRootPath, (_a = argv.assetPath) !== null && _a !== void 0 ? _a : 'assets');
+        project = await loadProject(argv, projectRootPath, argv.assetPath ?? 'assets');
     }
     catch (e) {
         throw new Error(`Unable to load project: ${e.message}`);
@@ -39,13 +38,12 @@ async function loadProject(args, projectRootPath, projectAssetPath) {
 }
 // TODO: Use the config loading stuff from @capacitor/configure
 function loadMobileProjectConfig(args) {
-    var _a, _b;
     return {
         ios: {
-            path: (_a = args.iosProject) !== null && _a !== void 0 ? _a : 'ios/App',
+            path: args.iosProject ?? 'ios/App',
         },
         android: {
-            path: (_b = args.androidProject) !== null && _b !== void 0 ? _b : 'android',
+            path: args.androidProject ?? 'android',
         },
     };
 }

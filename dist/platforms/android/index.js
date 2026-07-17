@@ -16,8 +16,7 @@ class AndroidAssetGenerator extends asset_generator_1.AssetGenerator {
         super(options);
     }
     async generate(asset, project) {
-        var _a;
-        const androidDir = (_a = project.config.android) === null || _a === void 0 ? void 0 : _a.path;
+        const androidDir = project.config.android?.path;
         if (!androidDir) {
             throw new error_1.BadProjectError('No android project found');
         }
@@ -60,23 +59,20 @@ class AndroidAssetGenerator extends asset_generator_1.AssetGenerator {
             generated.push(...generatedLegacyIcons);
             const splashes = Object.values(AndroidAssetTemplates).filter((a) => a.kind === "splash" /* AssetKind.Splash */);
             const generatedSplashes = await Promise.all(splashes.map(async (splash) => {
-                var _a;
-                return this._generateSplashesFromLogo(project, asset, splash, pipe, (_a = this.options.splashBackgroundColor) !== null && _a !== void 0 ? _a : '#ffffff');
+                return this._generateSplashesFromLogo(project, asset, splash, pipe, this.options.splashBackgroundColor ?? '#ffffff');
             }));
             generated.push(...generatedSplashes);
         }
         // Generate dark splashes
         const darkSplashes = Object.values(AndroidAssetTemplates).filter((a) => a.kind === "splash-dark" /* AssetKind.SplashDark */);
         const generatedSplashes = await Promise.all(darkSplashes.map(async (splash) => {
-            var _a;
-            return this._generateSplashesFromLogo(project, asset, splash, pipe, (_a = this.options.splashBackgroundColorDark) !== null && _a !== void 0 ? _a : '#111111');
+            return this._generateSplashesFromLogo(project, asset, splash, pipe, this.options.splashBackgroundColorDark ?? '#111111');
         }));
         generated.push(...generatedSplashes);
         return [...generated];
     }
     // Generate adaptive icons from the source logo
     async _generateAdaptiveIconsFromLogo(project, asset, pipe) {
-        var _a, _b;
         const isNightMode = asset.kind !== "logo" /* AssetKind.Logo */;
         // Create the background pipeline for the generated icons
         const backgroundPipe = (0, sharp_1.default)({
@@ -85,8 +81,8 @@ class AndroidAssetGenerator extends asset_generator_1.AssetGenerator {
                 height: asset.height,
                 channels: 4,
                 background: isNightMode
-                    ? ((_a = this.options.iconBackgroundColorDark) !== null && _a !== void 0 ? _a : '#111111')
-                    : ((_b = this.options.iconBackgroundColor) !== null && _b !== void 0 ? _b : '#ffffff'),
+                    ? (this.options.iconBackgroundColorDark ?? '#111111')
+                    : (this.options.iconBackgroundColor ?? '#ffffff'),
             },
         });
         const adaptiveIconKind = isNightMode ? "adaptive-icon-dark" /* AssetKind.AdaptiveIconDark */ : "adaptive-icon" /* AssetKind.AdaptiveIcon */;
@@ -100,7 +96,6 @@ class AndroidAssetGenerator extends asset_generator_1.AssetGenerator {
         return [...foregroundImages, ...backgroundImages];
     }
     async _generateSplashesFromLogo(project, asset, splash, pipe, backgroundColor) {
-        var _a, _b, _c, _d, _e, _f, _g;
         // Generate light splash
         const resPath = this.getResPath(project);
         let drawableDir = `drawable`;
@@ -112,19 +107,19 @@ class AndroidAssetGenerator extends asset_generator_1.AssetGenerator {
             await (0, utils_fs_1.mkdirp)(parentDir);
         }
         const dest = (0, path_1.join)(resPath, drawableDir, 'splash.png');
-        const targetLogoWidthPercent = (_a = this.options.logoSplashScale) !== null && _a !== void 0 ? _a : 0.2;
-        let targetWidth = (_b = this.options.logoSplashTargetWidth) !== null && _b !== void 0 ? _b : Math.floor(((_c = splash.width) !== null && _c !== void 0 ? _c : 0) * targetLogoWidthPercent);
+        const targetLogoWidthPercent = this.options.logoSplashScale ?? 0.2;
+        let targetWidth = this.options.logoSplashTargetWidth ?? Math.floor((splash.width ?? 0) * targetLogoWidthPercent);
         if (targetWidth > splash.width || targetWidth > splash.height) {
-            targetWidth = Math.floor(((_d = splash.width) !== null && _d !== void 0 ? _d : 0) * targetLogoWidthPercent);
+            targetWidth = Math.floor((splash.width ?? 0) * targetLogoWidthPercent);
         }
         if (targetWidth > splash.width || targetWidth > splash.height) {
             (0, log_1.warn)(`Logo dimensions exceed dimensions of splash ${splash.width}x${splash.height}, using default logo size`);
-            targetWidth = Math.floor(((_e = splash.width) !== null && _e !== void 0 ? _e : 0) * 0.2);
+            targetWidth = Math.floor((splash.width ?? 0) * 0.2);
         }
         const canvas = (0, sharp_1.default)({
             create: {
-                width: (_f = splash.width) !== null && _f !== void 0 ? _f : 0,
-                height: (_g = splash.height) !== null && _g !== void 0 ? _g : 0,
+                width: splash.width ?? 0,
+                height: splash.height ?? 0,
                 channels: 4,
                 background: backgroundColor,
             },
@@ -294,8 +289,7 @@ class AndroidAssetGenerator extends asset_generator_1.AssetGenerator {
         });
     }
     async updateManifest(project) {
-        var _a, _b;
-        (_b = (_a = project.android) === null || _a === void 0 ? void 0 : _a.getAndroidManifest()) === null || _b === void 0 ? void 0 : _b.setAttrs('manifest/application', {
+        project.android?.getAndroidManifest()?.setAttrs('manifest/application', {
             'android:icon': '@mipmap/ic_launcher',
             'android:roundIcon': '@mipmap/ic_launcher_round',
         });
@@ -329,8 +323,7 @@ class AndroidAssetGenerator extends asset_generator_1.AssetGenerator {
         return [dest, outputInfo];
     }
     getResPath(project) {
-        var _a;
-        return (0, path_1.join)(project.config.android.path, 'app', 'src', (_a = this.options.androidFlavor) !== null && _a !== void 0 ? _a : 'main', 'res');
+        return (0, path_1.join)(project.config.android.path, 'app', 'src', this.options.androidFlavor ?? 'main', 'res');
     }
     async generateNotificationIcons(asset, project) {
         const pipe = asset.pipeline();

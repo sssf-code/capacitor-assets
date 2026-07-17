@@ -45,6 +45,9 @@ importers:
       node-html-parser:
         specifier: ^7.1.0
         version: 7.1.0
+      prompts:
+        specifier: ^2.4.2
+        version: 2.4.2
       sharp:
         specifier: ^0.35.3
         version: 0.35.3(@types/node@24.13.3)
