@@ -13,17 +13,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [22.x, 24.x]
     steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: actions/checkout@v4
-      - name: npm install, build, and test
+          cache: pnpm
+      - name: Install, build, and test
         env:
           CI: true
         run: |
-          npm install
-          npm run build
-          npm test
+          pnpm install --frozen-lockfile
+          pnpm run build
+          pnpm test

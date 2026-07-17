@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setArguments = exports.loadContext = void 0;
+exports.loadContext = loadContext;
+exports.setArguments = setArguments;
 const tslib_1 = require("tslib");
 const path_1 = require("path");
 const yargs_1 = tslib_1.__importDefault(require("yargs"));
@@ -9,7 +10,7 @@ const project_1 = require("./project");
 async function loadContext(projectRootPath) {
     var _a;
     const rootDir = process.cwd();
-    const argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv)).argv;
+    const argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv)).parseSync();
     let project;
     try {
         project = await loadProject(argv, projectRootPath, (_a = argv.assetPath) !== null && _a !== void 0 ? _a : 'assets');
@@ -26,12 +27,10 @@ async function loadContext(projectRootPath) {
         rootDir,
     };
 }
-exports.loadContext = loadContext;
 function setArguments(ctx, args) {
     ctx.args = args;
     process.env.VERBOSE = '' + !!args.verbose;
 }
-exports.setArguments = setArguments;
 async function loadProject(args, projectRootPath, projectAssetPath) {
     const config = await loadMobileProjectConfig(args);
     const project = new project_1.Project(projectRootPath, config, projectAssetPath);

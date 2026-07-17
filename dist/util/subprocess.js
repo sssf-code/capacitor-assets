@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runCommand = void 0;
+exports.runCommand = runCommand;
 const tslib_1 = require("tslib");
 const utils_subprocess_1 = require("@ionic/utils-subprocess");
 const colors_1 = tslib_1.__importDefault(require("../colors"));
@@ -19,4 +19,3 @@ async function runCommand(command, args, options = {}) {
         throw e;
     }
 }
-exports.runCommand = runCommand;

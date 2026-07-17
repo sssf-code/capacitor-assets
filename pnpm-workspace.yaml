@@ -1,0 +1,6 @@
+# Security pins for unmaintained transitive dependencies.
+# Revisit periodically — remove once the parent package updates its own ranges.
+overrides:
+  'mergexml>@xmldom/xmldom': ^0.8.13
+  'xcode>uuid': ^11.1.1
+  'replace>minimatch': ^3.1.5

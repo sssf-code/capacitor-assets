@@ -1,5 +1,4 @@
 import { mkdirp, pathExists, readFile, readJSON, rmSync, writeJSON } from '@ionic/utils-fs';
-import fetch from 'node-fetch';
 import parse from 'node-html-parser';
 import { basename, extname, join, posix, relative, sep } from 'path';
 import type { Sharp } from 'sharp';

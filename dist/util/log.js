@@ -1,6 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fatal = exports.error = exports.warn = exports.log = exports.debug = exports.logger = exports.output = void 0;
+exports.logger = exports.output = void 0;
+exports.debug = debug;
+exports.log = log;
+exports.warn = warn;
+exports.error = error;
+exports.fatal = fatal;
 const tslib_1 = require("tslib");
 const cli_framework_output_1 = require("@ionic/cli-framework-output");
 const colors_1 = tslib_1.__importDefault(require("../colors"));
@@ -27,19 +32,15 @@ function debug(...args) {
         console.log(...args);
     }
 }
-exports.debug = debug;
 function log(...args) {
     console.log(...args);
 }
-exports.log = log;
 function warn(...args) {
     console.warn(...args);
 }
-exports.warn = warn;
 function error(...args) {
     console.error(...args);
 }
-exports.error = error;
 function fatal(msg, exc) {
     console.error(colors_1.default.failure(`Fatal error: ${msg}`));
     console.log('ERROR', msg, exc);
@@ -48,4 +49,3 @@ function fatal(msg, exc) {
     }
     process.exit(1);
 }
-exports.fatal = fatal;

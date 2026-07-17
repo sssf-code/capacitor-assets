@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runProgram = exports.run = void 0;
+exports.run = run;
+exports.runProgram = runProgram;
 const tslib_1 = require("tslib");
 const commander_1 = require("commander");
 const c = tslib_1.__importStar(require("./colors"));
@@ -27,7 +28,6 @@ async function run() {
         throw e;
     }
 }
-exports.run = run;
 function parseIntOption(value) {
     // parseInt takes a string and a radix
     const parsedValue = parseInt(value, 10);
@@ -77,4 +77,3 @@ function runProgram(ctx) {
     }));
     program.parse(process.argv);
 }
-exports.runProgram = runProgram;

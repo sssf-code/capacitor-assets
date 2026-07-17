@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PwaAssetGenerator = exports.PWA_ASSET_PATH = void 0;
 const tslib_1 = require("tslib");
 const utils_fs_1 = require("@ionic/utils-fs");
-const node_fetch_1 = tslib_1.__importDefault(require("node-fetch"));
 const node_html_parser_1 = tslib_1.__importDefault(require("node-html-parser"));
 const path_1 = require("path");
 const sharp_1 = tslib_1.__importDefault(require("sharp"));
@@ -29,7 +28,7 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
         let assetSizes = assets_1.PWA_IOS_DEVICE_SIZES;
         if (!this.options.pwaNoAppleFetch) {
             try {
-                const res = await (0, node_fetch_1.default)(appleInterfacePage);
+                const res = await fetch(appleInterfacePage);
                 const html = await res.text();
                 const doc = (0, node_html_parser_1.default)(html);
                 const target = doc.querySelector('main > section .row > .column table');

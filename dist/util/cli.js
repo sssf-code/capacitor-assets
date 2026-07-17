@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.wrapAction = void 0;
+exports.wrapAction = wrapAction;
 const log_1 = require("./log");
 function wrapAction(action) {
     return async (...args) => {
@@ -13,7 +13,6 @@ function wrapAction(action) {
         }
     };
 }
-exports.wrapAction = wrapAction;
 /*
 export async function logPrompt(msg: string, promptObject: any) {
   const { wordWrap } = await import('@ionic/cli-framework-output');

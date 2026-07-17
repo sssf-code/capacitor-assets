@@ -1,4 +1,4 @@
-import sharp from 'sharp';
+import type { Sharp } from 'sharp';
 import type { AssetGenerator } from './asset-generator';
 import type { AssetKind, Platform } from './definitions';
 import { Format } from './definitions';
@@ -17,7 +17,7 @@ export declare class InputAsset {
     height?: number;
     private _sharp;
     constructor(path: string, kind: AssetKind, platform: Platform);
-    pipeline(): sharp.Sharp | undefined;
+    pipeline(): Sharp | undefined;
     format(): Format.Jpeg | Format.Png | Format.Svg | Format.Unknown;
     load(): Promise<void>;
     generate(strategy: AssetGenerator, project: Project): Promise<OutputAsset[]>;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.run = void 0;
+exports.run = run;
 const tslib_1 = require("tslib");
 const c = tslib_1.__importStar(require("../colors"));
 const android_1 = require("../platforms/android");
@@ -59,7 +59,6 @@ async function run(ctx) {
     }
     return [];
 }
-exports.run = run;
 async function verifyPlatformFolders(platforms, project) {
     var _a, _b;
     if (platforms.indexOf('ios') >= 0 && !(await project.iosExists())) {
