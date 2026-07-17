@@ -72,7 +72,7 @@ async function verifyPlatformFolders(platforms, project) {
 async function generateAssets(assets, generators, project) {
     const generated = [];
     async function generateAndCollect(asset) {
-        const g = await Promise.all(generators.map((g) => asset.generate(g, project)));
+        const g = await Promise.all(generators.map((gen) => asset.generate(gen, project)));
         generated.push(...g.flat().filter((f) => !!f));
     }
     const assetTypes = Object.values(assets).filter((v) => !!v);
@@ -109,21 +109,21 @@ function logGenerated(generated) {
     }
     (0, log_1.log)('\n');
     // Aggregate total assets and size per platform
-    const totals = sorted.reduce((totals, g) => {
-        if (!(g.template.platform in totals)) {
-            totals[g.template.platform] = {
+    const totals = sorted.reduce((acc, g) => {
+        if (!(g.template.platform in acc)) {
+            acc[g.template.platform] = {
                 count: 0,
                 size: 0,
             };
         }
-        const entry = totals[g.template.platform];
+        const entry = acc[g.template.platform];
         const count = Object.values(g.destFilenames).reduce((v) => v + 1, 0);
-        const size = Object.values(g.outputInfoMap).reduce((v, c) => v + c.size, 0);
-        totals[g.template.platform] = {
+        const bytes = Object.values(g.outputInfoMap).reduce((v, info) => v + info.size, 0);
+        acc[g.template.platform] = {
             count: entry.count + count,
-            size: entry.size + size,
+            size: entry.size + bytes,
         };
-        return totals;
+        return acc;
     }, {});
     (0, log_1.log)('Totals:');
     for (const platformName of Object.keys(totals).sort()) {

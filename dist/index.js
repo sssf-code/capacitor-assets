@@ -66,12 +66,10 @@ function runProgram(ctx) {
         */
         .action((0, cli_1.wrapAction)(async (args = {}) => {
         (0, ctx_1.setArguments)(ctx, args);
-        const { run } = await import('./tasks/generate.js');
-        await run(ctx);
+        const { run: runGenerate } = await import('./tasks/generate.js');
+        await runGenerate(ctx);
     }));
-    program.arguments('[command]').action(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (0, cli_1.wrapAction)((_) => {
+    program.arguments('[command]').action((0, cli_1.wrapAction)((_) => {
         (0, log_1.log)(c.strong('\n⚡️ Capacitor Assets ⚡️\n'));
         program.outputHelp();
     }));

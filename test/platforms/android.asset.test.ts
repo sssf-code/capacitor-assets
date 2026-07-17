@@ -1,23 +1,17 @@
-import { copy, pathExists, readdirp, readFile, rmSync as rm, statSync } from '@ionic/utils-fs';
-import tempy from 'tempy';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { copy, pathExists, rmSync as rm } from '@ionic/utils-fs';
+import { temporaryDirectory } from 'tempy';
 import sharp from 'sharp';
 import { join } from 'path';
 
 import { Context, loadContext } from '../../src/ctx';
-import {
-  AndroidOutputAssetTemplate,
-  AndroidOutputAssetTemplateAdaptiveIcon,
-  AssetKind,
-  Assets,
-} from '../../src/definitions';
+import { AndroidOutputAssetTemplate, AndroidOutputAssetTemplateAdaptiveIcon, Assets } from '../../src/definitions';
 import { OutputAsset } from '../../src/output-asset';
 import { AndroidAssetGenerator } from '../../src/platforms/android';
-import * as AndroidAssets from '../../src/platforms/android/assets';
 
 describe('Android asset test', () => {
   let ctx: Context;
-  let assets: Assets;
-  const fixtureDir = tempy.directory();
+  const fixtureDir = temporaryDirectory();
 
   beforeAll(async () => {
     await copy('test/fixtures/app', fixtureDir);
@@ -25,7 +19,6 @@ describe('Android asset test', () => {
 
   beforeEach(async () => {
     ctx = await loadContext(fixtureDir);
-    assets = await ctx.project.loadInputAssets();
   });
 
   afterAll(async () => {
@@ -74,7 +67,6 @@ describe('Android asset test', () => {
     // Expect legacy main icons and rounded to be generated
     expect(generatedAssets.length).toBe(12);
 
-    const template = generatedAssets[0].template;
 
     Object.values(generatedAssets[0].destFilenames).map(async (f) => expect(await pathExists(f)).toBe(true));
 
@@ -120,7 +112,7 @@ describe('Android asset test', () => {
 describe('Android Asset Test - Logo Only', () => {
   let ctx: Context;
   let assets: Assets;
-  const fixtureDir = tempy.directory();
+  const fixtureDir = temporaryDirectory();
 
   beforeAll(async () => {
     await copy('test/fixtures/app-logo-only', fixtureDir);

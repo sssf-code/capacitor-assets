@@ -15,7 +15,7 @@ async function loadContext(projectRootPath) {
         project = await loadProject(argv, projectRootPath, argv.assetPath ?? 'assets');
     }
     catch (e) {
-        throw new Error(`Unable to load project: ${e.message}`);
+        throw new Error(`Unable to load project: ${e.message}`, { cause: e });
     }
     return {
         args: argv,

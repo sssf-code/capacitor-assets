@@ -95,13 +95,12 @@ export function runProgram(ctx: Context): void {
       wrapAction(async (args = {}) => {
         setArguments(ctx, args);
 
-        const { run } = await import('./tasks/generate.js');
-        await run(ctx);
+        const { run: runGenerate } = await import('./tasks/generate.js');
+        await runGenerate(ctx);
       }),
     );
 
   program.arguments('[command]').action(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     wrapAction((_: any) => {
       log(c.strong('\n⚡️ Capacitor Assets ⚡️\n'));
       program.outputHelp();

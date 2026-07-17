@@ -65,7 +65,7 @@ export class PwaAssetGenerator extends AssetGenerator {
         const deduped = new Set(sizeStrings);
 
         assetSizes = Array.from(deduped);
-      } catch (e) {
+      } catch {
         warn(
           `Unable to load iOS HIG screen sizes to generate iOS PWA splash screens. Using local snapshot of device sizes. Use --pwaNoAppleFetch true to always use local sizes`,
         );
@@ -92,9 +92,6 @@ export class PwaAssetGenerator extends AssetGenerator {
         return this.generateFromLogo(asset, project);
       case AssetKind.Icon:
         return this.generateIcons(asset, project);
-      // eslint-disable-next-line no-duplicate-case
-      case AssetKind.Icon:
-        return [];
       case AssetKind.Splash:
       case AssetKind.SplashDark:
         // PWA has no splashes

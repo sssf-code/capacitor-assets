@@ -7,7 +7,6 @@ class BaseError extends Error {
         super(message);
         this.message = message;
         this.stack = new Error().stack || '';
-        this.message = message;
     }
     toString() {
         return this.message;

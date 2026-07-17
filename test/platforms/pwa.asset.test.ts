@@ -1,17 +1,18 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { copy, pathExists, readJSON, rmSync as rm } from '@ionic/utils-fs';
-import tempy from 'tempy';
+import { temporaryDirectory } from 'tempy';
 
 import { Context, loadContext } from '../../src/ctx';
 import { PwaAssetGenerator } from '../../src/platforms/pwa';
 import { AssetKind, PwaOutputAssetTemplate } from '../../src/definitions';
-import { ASSETS as PwaAssets, PWA_IOS_DEVICE_SIZES } from '../../src/platforms/pwa/assets';
+import { ASSETS as PwaAssets } from '../../src/platforms/pwa/assets';
 import sharp from 'sharp';
 import { isAbsolute, join, parse } from 'path';
 import { OutputAsset } from '../../src/output-asset';
 
 describe('PWA Asset Test', () => {
   let ctx: Context;
-  const fixtureDir = tempy.directory();
+  const fixtureDir = temporaryDirectory();
 
   beforeAll(async () => {
     await copy('test/fixtures/app', fixtureDir);
@@ -93,7 +94,7 @@ describe('PWA Asset Test', () => {
 
 describe('PWA Asset Test - logo only', () => {
   let ctx: Context;
-  const fixtureDir = tempy.directory();
+  const fixtureDir = temporaryDirectory();
 
   async function verifySizes(generatedAssets: OutputAsset<PwaOutputAssetTemplate>[]) {
     const sizedSet = await Promise.all(
@@ -122,7 +123,6 @@ describe('PWA Asset Test - logo only', () => {
   it('Should update manifest with generated assets and colors from logo', async () => {
     const assets = await ctx.project.loadInputAssets();
 
-    const exportedIcons = Object.values(PwaAssets).filter((a) => a.kind === AssetKind.Icon);
 
     const strategy = new PwaAssetGenerator({
       splashBackgroundColor: '#dedbef',

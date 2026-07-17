@@ -1,9 +1,10 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { copy, pathExists, readFile, rmSync as rm } from '@ionic/utils-fs';
-import tempy from 'tempy';
+import { temporaryDirectory } from 'tempy';
 
 import { Context, loadContext } from '../../src/ctx';
 import { IosAssetGenerator, IOS_SPLASH_IMAGE_SET_PATH } from '../../src/platforms/ios';
-import { AssetKind, Assets, Format, IosContents, IosOutputAssetTemplate } from '../../src/definitions';
+import { AssetKind, Assets, IosContents, IosOutputAssetTemplate } from '../../src/definitions';
 import * as IosAssets from '../../src/platforms/ios/assets';
 import sharp from 'sharp';
 import { join } from 'path';
@@ -12,7 +13,7 @@ import { OutputAsset } from '../../src/output-asset';
 describe('iOS Asset Test', () => {
   let ctx: Context;
   let assets: Assets;
-  const fixtureDir = tempy.directory();
+  const fixtureDir = temporaryDirectory();
 
   beforeAll(async () => {
     await copy('test/fixtures/app', fixtureDir);
@@ -89,7 +90,7 @@ describe('iOS Asset Test', () => {
 describe('iOS Asset Test - Logo Only', () => {
   let ctx: Context;
   let assets: Assets;
-  const fixtureDir = tempy.directory();
+  const fixtureDir = temporaryDirectory();
 
   beforeAll(async () => {
     await copy('test/fixtures/app-logo-only', fixtureDir);
@@ -148,9 +149,6 @@ describe('iOS Asset Test - Logo Only', () => {
     let generatedAssets = ((await assets.logoDark?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<IosOutputAssetTemplate>[];
 
-    const assetTemplates = Object.values(IosAssets).filter(
-      (a) => [AssetKind.Icon, AssetKind.Splash, AssetKind.SplashDark].indexOf(a.kind) >= 0,
-    );
 
     // Shouldn't generate standard splash
     expect(generatedAssets.find((f) => f.asset.kind === AssetKind.Splash)).toBeUndefined();
