@@ -59,6 +59,8 @@ Where the provided flags are:
 - `--splashBackgroundColorDark` - the background color (hex value) used when generating splash screens for dark mode (where supported) (default `#111111`)
 - `--logoSplashTargetWidth` - A specific width to set the logo to when generating splash screens from a single logo file (not used by default, logo is scaled as percentage of splash instead, see `--logoSplashScale`)
 - `--logoSplashScale` - the scale multiplier to apply to the logo when generating splash screens from a single logo file (default: `0.2`)
+- `--androidFlavor <name>` - the Android product flavor where generated assets will be created (default `main`)
+- `--pwaTags` - log the `index.html` tags needed to use the generated PWA icons and iOS splash screens
 - `--ios` - explicitly run iOS asset generation. Using a platform flag makes the platform list exclusive.
 - `--android` - explicitly run Android asset generation. Using a platform flag makes the platform list exclusive.
 - `--pwa` - explicitly run PWA asset generation. Using a platform flag makes the platform list exclusive.
