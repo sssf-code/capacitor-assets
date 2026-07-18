@@ -1,5 +1,5 @@
 ---
-'sssf-capacitor-assets': major
+'sssf-capacitor-assets': minor
 ---
 
 Modernize generated assets to current (2026) platform standards and fix asset wiring bugs.
