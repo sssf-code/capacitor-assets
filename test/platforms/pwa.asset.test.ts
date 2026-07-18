@@ -26,6 +26,17 @@ describe('PWA Asset Test', () => {
     await rm(fixtureDir, { force: true, recursive: true });
   });
 
+  async function verifySplashSizes(generatedAssets: OutputAsset<PwaOutputAssetTemplate>[]) {
+    const sizedSet = await Promise.all(
+      generatedAssets.map(async (asset) => {
+        const dest = Object.values(asset.destFilenames)[0];
+        const metadata = await sharp(dest).metadata();
+        return metadata.width === asset.template.width && metadata.height === asset.template.height;
+      }),
+    );
+    expect(sizedSet.every((e) => !!e)).toBe(true);
+  }
+
   it('Should generate PWA icons', async () => {
     const assets = await ctx.project.loadInputAssets();
 
@@ -86,17 +97,22 @@ describe('PWA Asset Test', () => {
     expect(manifest.icons.every((icon: any) => icon.type === 'image/png')).toBe(true);
   });
 
-  it.skip('Should generate PWA splashes', async () => {
+  // Previously skipped because splash sizes came from a live fetch of
+  // Apple's HIG page; the static device list made this deterministic.
+  it('Should generate PWA splashes', async () => {
     const assets = await ctx.project.loadInputAssets();
 
     const strategy = new PwaAssetGenerator();
     let generatedAssets = ((await assets.splash?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<PwaOutputAssetTemplate>[];
 
-    expect(generatedAssets.length).toBeGreaterThan(10);
+    expect(generatedAssets.length).toBe(PWA_IOS_DEVICE_SIZES.length);
 
     generatedAssets = ((await assets.splashDark?.generate(strategy, ctx.project)) ??
       []) as OutputAsset<PwaOutputAssetTemplate>[];
+
+    expect(generatedAssets.length).toBe(PWA_IOS_DEVICE_SIZES.length);
+    await verifySplashSizes(generatedAssets);
   });
 });
 

@@ -271,11 +271,16 @@ class PwaAssetGenerator extends asset_generator_1.AssetGenerator {
             replacedIcons.push(this.makeIconManifestEntry(asset.template, relativePath));
         }
         // Delete previously generated icon files that are no longer part of
-        // the generated set (e.g. legacy sizes from an older version)
+        // the generated set (e.g. legacy sizes from an older version). Only
+        // files inside this tool's own output directory are ever deleted —
+        // manifest entries pointing elsewhere are user-managed files.
+        const outputDir = (0, path_1.join)(pwaAssetDir, exports.PWA_ASSET_PATH);
         const newSrcs = new Set(replacedIcons.map((i) => i.src));
         for (const icon of icons) {
-            if (!newSrcs.has(icon.src) && (await (0, utils_fs_1.pathExists)((0, path_1.join)(pwaDir, icon.src)))) {
-                (0, utils_fs_1.rmSync)((0, path_1.join)(pwaDir, icon.src));
+            const iconPath = (0, path_1.join)(pwaDir, icon.src);
+            const isOurs = !(0, path_1.relative)(outputDir, iconPath).startsWith('..');
+            if (isOurs && !newSrcs.has(icon.src) && (await (0, utils_fs_1.pathExists)(iconPath))) {
+                (0, utils_fs_1.rmSync)(iconPath);
                 (0, log_1.warn)(`DELETE ${icon.src}`);
             }
         }

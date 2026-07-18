@@ -1,5 +1,5 @@
 ---
-'sssf-capacitor-assets': major
+'sssf-capacitor-assets': minor
 ---
 
 Modernize generated assets to current (2026) platform standards and fix asset wiring bugs.
@@ -24,4 +24,5 @@ Modernize generated assets to current (2026) platform standards and fix asset wi
 - Correct MIME `type` values in the manifest (the extension lookup never matched).
 - iOS startup-image device list refreshed through iPhone 17 / iPhone Air / M4 iPad Pro; the broken Apple HIG scraping (which silently produced zero splashes) is removed and `--pwaNoAppleFetch` is now a no-op.
 - `assets/pwa/*` platform-specific sources are now loaded (previously declared but ignored).
+- Manifest cleanup no longer deletes icon files outside the tool's own `icons/` output directory — previously any user-managed icon referenced in an existing manifest (e.g. an app's own logo) could be deleted during generation.
 - `--pwaTags` works again and prints correct `<link>` tags (point-based media queries, web-relative paths).
