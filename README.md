@@ -10,6 +10,15 @@ Note: previous versions of this tool supported Cordova but Cordova support has b
 
 ## Install
 
+From npm (published releases, with provenance):
+
+```shell
+pnpm add -D sssf-capacitor-assets
+# or: npm install --save-dev sssf-capacitor-assets
+```
+
+Or track the main branch directly:
+
 ```shell
 pnpm add -D github:sssf-code/capacitor-assets#main
 # or: npm install --save-dev github:sssf-code/capacitor-assets#main
