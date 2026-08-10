@@ -1,6 +1,6 @@
 {
   "name": "sssf-capacitor-assets",
-  "version": "4.1.3",
+  "version": "4.1.4",
   "packageManager": "pnpm@11.13.1",
   "description": "Generate icon and splash screen images for Capacitor apps",
   "homepage": "https://github.com/sssf-code/capacitor-assets",
@@ -71,7 +71,7 @@
     "@types/plist": "^3.0.5",
     "@types/yargs": "^17.0.35",
     "husky": "^9.1.7",
-    "oxlint": "^1.76.0",
+    "oxlint": "^1.77.0",
     "prettier": "^3.9.6",
     "rimraf": "^6.1.3",
     "tempy": "^3.2.0",
